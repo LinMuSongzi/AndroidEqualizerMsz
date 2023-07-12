@@ -33,6 +33,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.db.chart.model.LineSet;
 import com.db.chart.view.AxisController;
@@ -43,29 +44,29 @@ import java.util.ArrayList;
 
 
 public class DialogEqualizerFragment extends DialogFragment {
-    public static final  String ARG_AUDIO_SESSIOIN_ID = "audio_session_id";
-    private static final String TAG                   = DialogEqualizerFragment.class.getSimpleName();
-    private static       int    accentAlpha           = Color.BLUE;
-    private static       int    darkBackground        = Color.GRAY;
-    private static       int    textColor             = Color.WHITE;
-    private static       int    themeColor            = Color.parseColor("#B24242");
-    private static       int    backgroundColor       = Color.WHITE;
-    private static       int    themeRes              = 0;
-    private static       String titleString           = "";
-    private static       int    titleRes              = 0;
+    public static final String ARG_AUDIO_SESSIOIN_ID = "audio_session_id";
+    private static final String TAG = DialogEqualizerFragment.class.getSimpleName();
+    private static int accentAlpha = Color.BLUE;
+    private static int darkBackground = Color.GRAY;
+    private static int textColor = Color.WHITE;
+    private static int themeColor = Color.parseColor("#B24242");
+    private static int backgroundColor = Color.WHITE;
+    private static int themeRes = 0;
+    private static String titleString = "";
+    private static int titleRes = 0;
 
-    private Equalizer        mEqualizer;
-    private BassBoost        bassBoost;
-    private PresetReverb     presetReverb;
-    private LineSet          dataset;
-    private LineChartView    chart;
-    private float[]          points;
-    private int              y            = 0;
-    private SeekBar[]        seekBarFinal = new SeekBar[5];
-    private Spinner          presetSpinner;
-    private Context          ctx;
-    private int              audioSesionId;
-    private TextView         titleTextView;
+    private Equalizer mEqualizer;
+    private BassBoost bassBoost;
+    private PresetReverb presetReverb;
+    private LineSet dataset;
+    private LineChartView chart;
+    private float[] points;
+    private int y = 0;
+    private SeekBar[] seekBarFinal = new SeekBar[5];
+    private Spinner presetSpinner;
+    private Context ctx;
+    private int audioSesionId;
+    private TextView titleTextView;
     private AnalogController bassController;
     private AnalogController reverbController;
 
@@ -115,7 +116,7 @@ public class DialogEqualizerFragment extends DialogFragment {
         bassBoost = new BassBoost(0, audioSesionId);
         bassBoost.setEnabled(true);
         BassBoost.Settings bassBoostSettingTemp = bassBoost.getProperties();
-        BassBoost.Settings bassBoostSetting     = new BassBoost.Settings(bassBoostSettingTemp.toString());
+        BassBoost.Settings bassBoostSetting = new BassBoost.Settings(bassBoostSettingTemp.toString());
         bassBoostSetting.strength = Settings.equalizerModel.getBassStrength();
         bassBoost.setProperties(bassBoostSetting);
 
@@ -172,11 +173,14 @@ public class DialogEqualizerFragment extends DialogFragment {
         } else if (!TextUtils.isEmpty(titleString)) {
             titleTextView.setText(titleString);
         }
+
+
         SwitchCompat equalizerSwitch = view.findViewById(R.id.equalizer_switch);
         equalizerSwitch.setChecked(true);
         equalizerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                new ViewModelProvider(requireActivity()).get(EnableViewModel.class).getEnable().setValue(isChecked);
                 mEqualizer.setEnabled(isChecked);
                 bassBoost.setEnabled(isChecked);
                 presetReverb.setEnabled(isChecked);
@@ -191,7 +195,7 @@ public class DialogEqualizerFragment extends DialogFragment {
         Paint paint = new Paint();
         dataset = new LineSet();
 
-        bassController   = view.findViewById(R.id.controllerBass);
+        bassController = view.findViewById(R.id.controllerBass);
         reverbController = view.findViewById(R.id.controller3D);
 
         bassController.setLabel("BASS");
@@ -290,7 +294,7 @@ public class DialogEqualizerFragment extends DialogFragment {
         final short upperEqualizerBandLevel = mEqualizer.getBandLevelRange()[1];
 
         for (short i = 0; i < numberOfFrequencyBands; i++) {
-            final short    equalizerBandIndex      = i;
+            final short equalizerBandIndex = i;
             final TextView frequencyHeaderTextView = new TextView(ctx);
             frequencyHeaderTextView.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -325,7 +329,7 @@ public class DialogEqualizerFragment extends DialogFragment {
             );
             layoutParams.weight = 1;
 
-            SeekBar  seekBar  = new SeekBar(ctx);
+            SeekBar seekBar = new SeekBar(ctx);
             TextView textView = new TextView(ctx);
             switch (i) {
                 case 0:
@@ -368,15 +372,15 @@ public class DialogEqualizerFragment extends DialogFragment {
                 points[i] = mEqualizer.getBandLevel(equalizerBandIndex) - lowerEqualizerBandLevel;
                 dataset.addPoint(frequencyHeaderTextView.getText().toString(), points[i]);
                 seekBar.setProgress(mEqualizer.getBandLevel(equalizerBandIndex) - lowerEqualizerBandLevel);
-                Settings.seekbarpos[i]       = mEqualizer.getBandLevel(equalizerBandIndex);
+                Settings.seekbarpos[i] = mEqualizer.getBandLevel(equalizerBandIndex);
                 Settings.isEqualizerReloaded = true;
             }
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     mEqualizer.setBandLevel(equalizerBandIndex, (short) (progress + lowerEqualizerBandLevel));
-                    points[seekBar.getId()]                                  = mEqualizer.getBandLevel(equalizerBandIndex) - lowerEqualizerBandLevel;
-                    Settings.seekbarpos[seekBar.getId()]                     = (progress + lowerEqualizerBandLevel);
+                    points[seekBar.getId()] = mEqualizer.getBandLevel(equalizerBandIndex) - lowerEqualizerBandLevel;
+                    Settings.seekbarpos[seekBar.getId()] = (progress + lowerEqualizerBandLevel);
                     Settings.equalizerModel.getSeekbarpos()[seekBar.getId()] = (progress + lowerEqualizerBandLevel);
                     dataset.updateValues(points);
                     chart.notifyDataUpdate();
@@ -469,8 +473,8 @@ public class DialogEqualizerFragment extends DialogFragment {
 
                         for (short i = 0; i < numberOfFreqBands; i++) {
                             seekBarFinal[i].setProgress(mEqualizer.getBandLevel(i) - lowerEqualizerBandLevel);
-                            points[i]                                  = mEqualizer.getBandLevel(i) - lowerEqualizerBandLevel;
-                            Settings.seekbarpos[i]                     = mEqualizer.getBandLevel(i);
+                            points[i] = mEqualizer.getBandLevel(i) - lowerEqualizerBandLevel;
+                            Settings.seekbarpos[i] = mEqualizer.getBandLevel(i);
                             Settings.equalizerModel.getSeekbarpos()[i] = mEqualizer.getBandLevel(i);
                         }
                         dataset.updateValues(points);

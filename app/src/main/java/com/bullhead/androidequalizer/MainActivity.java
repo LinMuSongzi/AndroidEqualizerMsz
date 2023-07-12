@@ -4,21 +4,18 @@ import android.animation.ValueAnimator;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.media.audiofx.Virtualizer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.DefaultLifecycleObserver;
-import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bullhead.equalizer.DialogEqualizerFragment;
+import com.bullhead.equalizer.EnableViewModel;
 import com.bullhead.equalizer.EqualizerFragment;
 import com.bullhead.equalizer.EqualizerModel;
 import com.bullhead.equalizer.Settings;
@@ -30,24 +27,30 @@ public class MainActivity extends AppCompatActivity {
 
     ValueAnimator valueAnimator;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        EnableViewModel vm = new ViewModelProvider(this).get(EnableViewModel.class);
+
         loadEqualizerSettings();
         mediaPlayer = MediaPlayer.create(this, R.raw.qsws);
         final int sessionId = mediaPlayer.getAudioSessionId();
+        vm.getSeesionId().setValue(sessionId);
         mediaPlayer.setLooping(true);
-        EqualizerFragment equalizerFragment = EqualizerFragment.newBuilder()
-                .setAccentColor(Color.parseColor("#00f0f0"))
-                .setAudioSessionId(sessionId)
-                .build();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.eqFrame, equalizerFragment)
-                .commit();
+//        EqualizerFragment equalizerFragment = EqualizerFragment.newBuilder()
+//                .setAccentColor(Color.parseColor("#00f0f0"))
+//                .setAudioSessionId(sessionId)
+//                .build();
+//        getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.eqFrame, equalizerFragment)
+//                .commit();
 
-        getLifecycle().addObserver(new HandlerVirtualizerLifecycle(sessionId));
-        getLifecycle().addObserver(new HandlerEnvironmentalReverbLifecycle(sessionId));
+//        getLifecycle().addObserver(new HandlerVirtualizerLifecycle(vm));
+        getLifecycle().addObserver(new HandlerEnvironmentalReverbLifecycle(vm));
     }
 
     private void showInDialog() {
