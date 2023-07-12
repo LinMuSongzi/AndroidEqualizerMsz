@@ -4,10 +4,10 @@ group="com.github.mosamabinomar"
 version="2.0"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion 24
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0.0"
 
@@ -44,7 +44,7 @@ artifacts {
 }
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    api 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.diogobernardino:williamchart:2.2'
     implementation 'com.h6ah4i.android.widget.verticalseekbar:verticalseekbar:0.7.0'
 

@@ -1,16 +1,22 @@
 package com.bullhead.androidequalizer;
 
+import android.animation.ValueAnimator;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.media.audiofx.Virtualizer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.bullhead.equalizer.DialogEqualizerFragment;
 import com.bullhead.equalizer.EqualizerFragment;
@@ -19,23 +25,29 @@ import com.bullhead.equalizer.Settings;
 import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "EqualizerActivity";
     private MediaPlayer mediaPlayer;
+
+    ValueAnimator valueAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         loadEqualizerSettings();
-        mediaPlayer = MediaPlayer.create(this, R.raw.lenka);
+        mediaPlayer = MediaPlayer.create(this, R.raw.qsws);
         final int sessionId = mediaPlayer.getAudioSessionId();
         mediaPlayer.setLooping(true);
         EqualizerFragment equalizerFragment = EqualizerFragment.newBuilder()
-                .setAccentColor(Color.parseColor("#4caf50"))
+                .setAccentColor(Color.parseColor("#00f0f0"))
                 .setAudioSessionId(sessionId)
                 .build();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.eqFrame, equalizerFragment)
                 .commit();
+
+        getLifecycle().addObserver(new HandlerVirtualizerLifecycle(sessionId));
+        getLifecycle().addObserver(new HandlerEnvironmentalReverbLifecycle(sessionId));
     }
 
     private void showInDialog() {
@@ -101,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveEqualizerSettings(){
-        if (Settings.equalizerModel != null){
+    private void saveEqualizerSettings() {
+        if (Settings.equalizerModel != null) {
             EqualizerSettings settings = new EqualizerSettings();
             settings.bassStrength = Settings.equalizerModel.getBassStrength();
             settings.presetPos = Settings.equalizerModel.getPresetPos();
@@ -118,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void loadEqualizerSettings(){
+    private void loadEqualizerSettings() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Gson gson = new Gson();
