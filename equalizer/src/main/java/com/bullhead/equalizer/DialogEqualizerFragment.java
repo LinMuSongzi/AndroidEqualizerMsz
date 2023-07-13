@@ -35,10 +35,11 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.db.chart.model.LineSet;
-import com.db.chart.view.AxisController;
-import com.db.chart.view.ChartView;
-import com.db.chart.view.LineChartView;
+
+import com.bullhead.equalizer.view.AxisController;
+import com.bullhead.equalizer.view.ChartView;
+import com.bullhead.equalizer.view.LineChartView;
+import com.bullhead.equalizer.view.LineSet;
 
 import java.util.ArrayList;
 
