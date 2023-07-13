@@ -1,13 +1,25 @@
 package com.bullhead.equalizer;
 
+import java.util.ArrayList;
+
 public class Settings {
-    public static boolean        isEqualizerEnabled  = true;
-    public static boolean        isEqualizerReloaded = true;
-    public static int[]          seekbarpos          = new int[5];
-    public static int            presetPos;
-    public static short          reverbPreset        = -1;
-    public static short          bassStrength        = -1;
-    public static EqualizerModel equalizerModel;
-    public static double         ratio               = 1.0;
-    public static boolean        isEditing           = false;
+    public  boolean        isEqualizerEnabled  = true;
+    public  boolean        isEqualizerReloaded = true;
+    public  int[]          seekbarpos          = new int[5];
+    public  int            presetPos;
+    public  short          reverbPreset        = -1;
+    public  short          bassStrength        = -1;
+    public  EqualizerModel equalizerModel;
+    public  double         ratio               = 1.0;
+    public  boolean        isEditing           = false;
+
+
+    public static SettingsArray settingsArray = null;
+
+
+    public static Settings indexBy(int index){
+        return settingsArray.getList().get(index);
+    }
+
+
 }

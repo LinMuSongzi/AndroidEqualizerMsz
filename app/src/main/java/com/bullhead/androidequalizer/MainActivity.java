@@ -7,61 +7,135 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bullhead.equalizer.DialogEqualizerFragment;
 import com.bullhead.equalizer.EnableViewModel;
 import com.bullhead.equalizer.EqualizerFragment;
 import com.bullhead.equalizer.EqualizerModel;
 import com.bullhead.equalizer.Settings;
+import com.bullhead.equalizer.SettingsArray;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
 import com.google.gson.Gson;
 
-public class MainActivity extends AppCompatActivity implements Observer<Integer> {
+import java.util.ArrayList;
+import java.util.List;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
+import kotlin.jvm.functions.Function2;
+
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "EqualizerActivity";
 
+    public static final int NUMBER = 3;
+
+    @NonNull
+    private ViewPager2 id_viewpage;
+
+    private final String[] titles = {"千山万水", "lenka英文", "歌谣"};
+    private final int[] colors = {Color.parseColor("#014acf"), Color.parseColor("#f091a6"), Color.parseColor("#d77099")};
     @NonNull
     private ExoPlayer[] mediaPlayers;
-
-    ValueAnimator valueAnimator;
+    //    private final Observer<Integer>[] observers = new Observer[]{
+//            (Observer<Integer>) audioSessionId -> addFragment(audioSessionId, colors[0], R.id.eqFrame1),
+//            (Observer<Integer>) audioSessionId -> addFragment(audioSessionId, colors[1], R.id.eqFrame2),
+//            (Observer<Integer>) audioSessionId -> addFragment(audioSessionId, colors[2], R.id.eqFrame3),
+//    };
     @NonNull
     EnableViewModel vm;
     private View root;
+
+    private ExoPlayer[] sum3() {
+        return new ExoPlayer[]{
+                EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws),//MediaPlayer.create(this, R.raw.qsws);
+                EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.lenka),
+                EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.sg)
+        };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        root = findViewById(R.id.eqFrame);
+        root = (View) findViewById(R.id.root);
+
+        id_viewpage = findViewById(R.id.id_viewpage);
         vm = new ViewModelProvider(this).get(EnableViewModel.class);
         loadEqualizerSettings();
-        mediaPlayers = new ExoPlayer[]{EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws)};//MediaPlayer.create(this, R.raw.qsws);
-        mediaPlayers[0].setRepeatMode(Player.REPEAT_MODE_ONE);
-        vm.getSeesionId()[0].observe(this, this);
-        vm.getSeesionId()[0].setValue(mediaPlayers[0].getAudioSessionId());
+        mediaPlayers = sum3();//new ExoPlayer[]{EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws)};//MediaPlayer.create(this, R.raw.qsws);
+
+        foreach((exoPlayer, index) -> {
+            if (exoPlayer != null) {
+                Log.i(TAG, "foreach: " + exoPlayer);
+                exoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+                vm.getSeesionId()[index].setValue(exoPlayer.getAudioSessionId());
+                if (index + 1 == mediaPlayers.length) {
+                    initPage();
+                }
+            }
+            return null;
+        });
+
+//        initPage();
+
     }
 
-    @Override
-    public void onChanged(Integer integer) {
-        EqualizerFragment equalizerFragment = EqualizerFragment.newBuilder()
-                .setAccentColor(Color.parseColor("#00f0f0"))
-                .setAudioSessionId(integer)
-                .build();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.eqFrame, equalizerFragment)
-                .commit();
+    private void initPage() {
+        id_viewpage.setOffscreenPageLimit(100);
+        id_viewpage.setAdapter(new FragmentStateAdapter(this) {
+            @NonNull
+            @Override
+            public Fragment createFragment(int position) {
+                return EqualizerFragment.newBuilder()
+                        .setAccentColor(colors[position])
+                        .setIndex(position)
+                        .setTitle(titles[position])
+                        .setAudioSessionId(mediaPlayers[position].getAudioSessionId())
+                        .build();
+            }
+
+            @Override
+            public int getItemCount() {
+                return mediaPlayers.length;
+            }
+        });
+    }
+
+    private void foreach(Function2<ExoPlayer, Integer, Unit> function0) {
+        for (int i = 0; i < mediaPlayers.length; i++) {
+            function0.invoke(mediaPlayers[i], i);
+        }
+    }
+
+    public void addFragment(Integer audioSessionId, int color, int id) {
+        if (audioSessionId != null && audioSessionId > 0) {
+            EqualizerFragment equalizerFragment = EqualizerFragment.newBuilder()
+                    .setAccentColor(color)
+                    .setAudioSessionId(audioSessionId)
+                    .build();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(id, equalizerFragment)
+                    .commit();
 
 //        getLifecycle().addObserver(new HandlerVirtualizerLifecycle(vm));
 //        getLifecycle().addObserver(new HandlerEnvironmentalReverbLifecycle(vm));
+        }
     }
 
     private void showInDialog() {
@@ -90,11 +164,12 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
     @Override
     protected void onPause() {
         try {
-            for (ExoPlayer mediaPlayer : mediaPlayers) {
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.pause();
+            foreach((exoPlayer, integer) -> {
+                if (exoPlayer != null && exoPlayer.isPlaying()) {
+                    exoPlayer.pause();
                 }
-            }
+                return null;
+            });
         } catch (Exception ex) {
             //ignore
         }
@@ -105,8 +180,10 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
     protected void onDestroy() {
         super.onDestroy();
         for (ExoPlayer mediaPlayer : mediaPlayers) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
+            if (mediaPlayer != null) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+            }
         }
     }
 
@@ -114,9 +191,12 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
     protected void onResume() {
         super.onResume();
         try {
-            for (ExoPlayer mediaPlayer : mediaPlayers) {
-                root.postDelayed(() -> mediaPlayer.play(), 2000);
-            }
+            foreach((exoPlayer, integer) -> {
+                if (exoPlayer != null && !exoPlayer.isPlaying()) {
+                    root.postDelayed(() -> exoPlayer.play(), 2000);
+                }
+                return null;
+            });
         } catch (Exception ex) {
             //ignore
         }
@@ -138,18 +218,18 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
     }
 
     private void saveEqualizerSettings() {
-        if (Settings.equalizerModel != null) {
-            EqualizerSettings settings = new EqualizerSettings();
-            settings.bassStrength = Settings.equalizerModel.getBassStrength();
-            settings.presetPos = Settings.equalizerModel.getPresetPos();
-            settings.reverbPreset = Settings.equalizerModel.getReverbPreset();
-            settings.seekbarpos = Settings.equalizerModel.getSeekbarpos();
+        if (Settings.settingsArray != null) {
+//            EqualizerSettings settings = new EqualizerSettings();
+//            settings.bassStrength = Settings.equalizerModel.getBassStrength();
+//            settings.presetPos = Settings.equalizerModel.getPresetPos();
+//            settings.reverbPreset = Settings.equalizerModel.getReverbPreset();
+//            settings.seekbarpos = Settings.equalizerModel.getSeekbarpos();
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
             Gson gson = new Gson();
             preferences.edit()
-                    .putString(PREF_KEY, gson.toJson(settings))
+                    .putString(PREF_KEY, gson.toJson(Settings.settingsArray))
                     .apply();
         }
     }
@@ -158,20 +238,29 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Gson gson = new Gson();
-        EqualizerSettings settings = gson.fromJson(preferences.getString(PREF_KEY, "{}"), EqualizerSettings.class);
-        EqualizerModel model = new EqualizerModel();
-        model.setBassStrength(settings.bassStrength);
-        model.setPresetPos(settings.presetPos);
-        model.setReverbPreset(settings.reverbPreset);
-        model.setSeekbarpos(settings.seekbarpos);
+        Settings.settingsArray = gson.fromJson(preferences.getString(PREF_KEY, "{}"), SettingsArray.class);
 
-        Settings.isEqualizerEnabled = true;
-        Settings.isEqualizerReloaded = true;
-        Settings.bassStrength = settings.bassStrength;
-        Settings.presetPos = settings.presetPos;
-        Settings.reverbPreset = settings.reverbPreset;
-        Settings.seekbarpos = settings.seekbarpos;
-        Settings.equalizerModel = model;
+        if (Settings.settingsArray.getList() == null) {
+            Settings.settingsArray.setList(new ArrayList<>());
+            List<Settings> settings = new ArrayList<>();
+            for (int i = 0; i < NUMBER; i++) {
+                settings.add(new Settings());
+            }
+            Settings.settingsArray.setList(settings);
+        }
+//        EqualizerModel model = new EqualizerModel();
+//        model.setBassStrength(settings.bassStrength);
+//        model.setPresetPos(settings.presetPos);
+//        model.setReverbPreset(settings.reverbPreset);
+//        model.setSeekbarpos(settings.seekbarpos);
+//
+//        Settings.isEqualizerEnabled = true;
+//        Settings.isEqualizerReloaded = true;
+//        Settings.bassStrength = settings.bassStrength;
+//        Settings.presetPos = settings.presetPos;
+//        Settings.reverbPreset = settings.reverbPreset;
+//        Settings.seekbarpos = settings.seekbarpos;
+//        Settings.equalizerModel = model;
     }
 
     public static final String PREF_KEY = "equalizer";
