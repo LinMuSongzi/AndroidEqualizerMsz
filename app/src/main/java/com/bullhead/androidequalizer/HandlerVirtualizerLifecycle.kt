@@ -27,10 +27,10 @@ class HandlerVirtualizerLifecycle( val viewModel: EnableViewModel) : DefaultLife
                 virtualizer = Virtualizer(0, it)
                 virtualizer.enabled = true
 
-                Log.i(TAG, "onCreate: virtualizer.enabled  = "+virtualizer.enabled)
-                Log.i(TAG, "onCreate: virtualizer.roundedStrength  = "+virtualizer.roundedStrength)
-                Log.i(TAG, "onCreate: virtualizer.properties  = "+virtualizer.properties)
-                Log.i(TAG, "onCreate: virtualizer.strengthSupported  = "+virtualizer.strengthSupported)
+                Log.i(TAG, "onCreate: virtualizer2.enabled  = "+virtualizer.enabled)
+                Log.i(TAG, "onCreate: virtualizer2.roundedStrength  = "+virtualizer.roundedStrength)
+                Log.i(TAG, "onCreate: virtualizer2.properties  = "+virtualizer.properties)
+                Log.i(TAG, "onCreate: virtualizer2.strengthSupported  = "+virtualizer.strengthSupported)
                 virtualizer.observerEnable(owner,viewModel)
             }
         }
