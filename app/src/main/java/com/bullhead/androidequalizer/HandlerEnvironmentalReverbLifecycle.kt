@@ -34,7 +34,7 @@ class HandlerEnvironmentalReverbLifecycle(val viewModel: EnableViewModel) : Defa
 
 
     override fun onCreate(owner: LifecycleOwner) {
-        viewModel.seesionId.observe(owner) {
+        viewModel.seesionId[0].observe(owner) {
             it?.apply {
                 if (reverb != null) {
                     reverb!!.release()

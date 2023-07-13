@@ -22,7 +22,7 @@ class HandlerVirtualizerLifecycle( val viewModel: EnableViewModel) : DefaultLife
     val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(owner: LifecycleOwner) {
-        viewModel.seesionId.observe(owner){
+        viewModel.seesionId[0].observe(owner){
             it?.apply {
                 virtualizer = Virtualizer(0, it)
                 virtualizer.enabled = true
