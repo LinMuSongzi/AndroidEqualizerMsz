@@ -9,9 +9,12 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bullhead.equalizer.DialogEqualizerFragment;
@@ -19,43 +22,51 @@ import com.bullhead.equalizer.EnableViewModel;
 import com.bullhead.equalizer.EqualizerFragment;
 import com.bullhead.equalizer.EqualizerModel;
 import com.bullhead.equalizer.Settings;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Player;
 import com.google.gson.Gson;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Observer<Integer> {
     private static final String TAG = "EqualizerActivity";
-    private MediaPlayer mediaPlayer;
+
+    @NonNull
+    private ExoPlayer mediaPlayer;
 
     ValueAnimator valueAnimator;
-
-
+    @NonNull
+    EnableViewModel vm;
+    private View root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        EnableViewModel vm = new ViewModelProvider(this).get(EnableViewModel.class);
-
+        root = findViewById(R.id.eqFrame);
+        vm = new ViewModelProvider(this).get(EnableViewModel.class);
         loadEqualizerSettings();
-        mediaPlayer = MediaPlayer.create(this, R.raw.qsws);
-        final int sessionId = mediaPlayer.getAudioSessionId();
-        vm.getSeesionId().setValue(sessionId);
-        mediaPlayer.setLooping(true);
-//        EqualizerFragment equalizerFragment = EqualizerFragment.newBuilder()
-//                .setAccentColor(Color.parseColor("#00f0f0"))
-//                .setAudioSessionId(sessionId)
-//                .build();
-//        getSupportFragmentManager().beginTransaction()
-//                .replace(R.id.eqFrame, equalizerFragment)
-//                .commit();
+        mediaPlayer = EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws);//MediaPlayer.create(this, R.raw.qsws);
+        mediaPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+        vm.getSeesionId().observe(this, this);
+        vm.getSeesionId().setValue(mediaPlayer.getAudioSessionId());
+    }
+
+    @Override
+    public void onChanged(Integer integer) {
+        EqualizerFragment equalizerFragment = EqualizerFragment.newBuilder()
+                .setAccentColor(Color.parseColor("#00f0f0"))
+                .setAudioSessionId(integer)
+                .build();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.eqFrame, equalizerFragment)
+                .commit();
 
 //        getLifecycle().addObserver(new HandlerVirtualizerLifecycle(vm));
-        getLifecycle().addObserver(new HandlerEnvironmentalReverbLifecycle(vm));
+//        getLifecycle().addObserver(new HandlerEnvironmentalReverbLifecycle(vm));
     }
 
     private void showInDialog() {
-        int sessionId = mediaPlayer.getAudioSessionId();
-        if (sessionId > 0) {
+        Integer sessionId = vm.getSeesionId().getValue();
+        if (sessionId != null && sessionId > 0) {
             DialogEqualizerFragment fragment = DialogEqualizerFragment.newBuilder()
                     .setAudioSessionId(sessionId)
                     .title(R.string.app_name)
@@ -79,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         try {
-            mediaPlayer.pause();
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+            }
         } catch (Exception ex) {
             //ignore
         }
@@ -87,15 +100,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mediaPlayer.stop();
+        mediaPlayer.release();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         try {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mediaPlayer.start();
-                }
-            }, 2000);
+            root.postDelayed(() -> mediaPlayer.play(), 2000);
         } catch (Exception ex) {
             //ignore
         }
@@ -154,4 +169,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static final String PREF_KEY = "equalizer";
+
+
 }
