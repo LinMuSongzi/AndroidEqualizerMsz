@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
     private static final String TAG = "EqualizerActivity";
 
     @NonNull
-    private ExoPlayer mediaPlayer;
+    private ExoPlayer[] mediaPlayers;
 
     ValueAnimator valueAnimator;
     @NonNull
@@ -44,10 +44,10 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
         root = findViewById(R.id.eqFrame);
         vm = new ViewModelProvider(this).get(EnableViewModel.class);
         loadEqualizerSettings();
-        mediaPlayer = EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws);//MediaPlayer.create(this, R.raw.qsws);
-        mediaPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
-        vm.getSeesionId().observe(this, this);
-        vm.getSeesionId().setValue(mediaPlayer.getAudioSessionId());
+        mediaPlayers = new ExoPlayer[]{EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws)};//MediaPlayer.create(this, R.raw.qsws);
+        mediaPlayers[0].setRepeatMode(Player.REPEAT_MODE_ONE);
+        vm.getSeesionId()[0].observe(this, this);
+        vm.getSeesionId()[0].setValue(mediaPlayers[0].getAudioSessionId());
     }
 
     @Override
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
     }
 
     private void showInDialog() {
-        Integer sessionId = vm.getSeesionId().getValue();
+        Integer sessionId = vm.getSeesionId()[0].getValue();
         if (sessionId != null && sessionId > 0) {
             DialogEqualizerFragment fragment = DialogEqualizerFragment.newBuilder()
                     .setAudioSessionId(sessionId)
@@ -90,8 +90,10 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
     @Override
     protected void onPause() {
         try {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.pause();
+            for (ExoPlayer mediaPlayer : mediaPlayers) {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                }
             }
         } catch (Exception ex) {
             //ignore
@@ -102,15 +104,19 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        for (ExoPlayer mediaPlayer : mediaPlayers) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         try {
-            root.postDelayed(() -> mediaPlayer.play(), 2000);
+            for (ExoPlayer mediaPlayer : mediaPlayers) {
+                root.postDelayed(() -> mediaPlayer.play(), 2000);
+            }
         } catch (Exception ex) {
             //ignore
         }

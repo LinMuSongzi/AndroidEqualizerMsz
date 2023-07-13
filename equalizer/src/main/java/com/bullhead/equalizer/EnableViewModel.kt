@@ -20,7 +20,9 @@ import com.google.android.exoplayer2.audio.DefaultAudioSink
 class EnableViewModel : ViewModel() {
 
 
-    val seesionId = MutableLiveData<Int>()
+    val seesionId = Array(3) {
+        MutableLiveData<Int>()
+    }
 
     val enable = MutableLiveData<Boolean>()
 
@@ -35,7 +37,7 @@ class EnableViewModel : ViewModel() {
             lifecycleOwner: LifecycleOwner,
             //请填写本地/网络的 wav文件
             paths: String,
-            isPlay:Boolean? = false
+            isPlay: Boolean? = false
         ): ExoPlayer {
 
             //1. 创建播放器
@@ -75,7 +77,7 @@ class EnableViewModel : ViewModel() {
 
             //5. 调用prepare开始加载准备数据，该方法时异步方法，不会阻塞ui线程
             player.prepare()
-            if(isPlay == true) {
+            if (isPlay == true) {
                 player.play() //  此时处于 STATE_BUFFERING = 2;
             }
 //            lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
@@ -89,7 +91,7 @@ class EnableViewModel : ViewModel() {
 
         }
 
-        fun <T:AudioEffect> T.observerEnable(lifecycleOwner: LifecycleOwner, vm: EnableViewModel) {
+        fun <T : AudioEffect> T.observerEnable(lifecycleOwner: LifecycleOwner, vm: EnableViewModel) {
             vm.enable.observe(lifecycleOwner) {
                 it?.apply {
                     enabled = it
