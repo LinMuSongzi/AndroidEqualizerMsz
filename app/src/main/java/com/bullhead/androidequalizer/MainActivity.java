@@ -63,9 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ExoPlayer[] sum3() {
         return new ExoPlayer[]{
-                EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws),//MediaPlayer.create(this, R.raw.qsws);
-                EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.lenka),
-                EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.sg)
+                EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.f)//MediaPlayer.create(this, R.raw.qsws);
+                ,EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.shh)
+//                ,EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.th)
         };
     }
 
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             foreach((exoPlayer, integer) -> {
                 if (exoPlayer != null && !exoPlayer.isPlaying()) {
-                    root.postDelayed(() -> exoPlayer.play(), 2000);
+                    root.postDelayed(() -> exoPlayer.play(), 1000);
                 }
                 return null;
             });
