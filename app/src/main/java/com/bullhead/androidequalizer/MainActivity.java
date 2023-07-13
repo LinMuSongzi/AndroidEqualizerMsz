@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements Observer<Integer>
                 .replace(R.id.eqFrame, equalizerFragment)
                 .commit();
 
-//        getLifecycle().addObserver(new HandlerVirtualizerLifecycle(vm));
+        getLifecycle().addObserver(new HandlerVirtualizerLifecycle(vm));
 //        getLifecycle().addObserver(new HandlerEnvironmentalReverbLifecycle(vm));
     }
 
