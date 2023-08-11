@@ -2,6 +2,7 @@ package com.bullhead.equalizer;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -160,6 +161,16 @@ public class EqualizerFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_equalizer, container, false);
     }
 
+
+    public static void chooseMusic(Activity activity) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+// 设置Intent的类型为音乐类型
+        intent.setType("audio/*");
+// 启动音乐选择器
+        activity.startActivityForResult(intent, PICK_MUSIC_REQUEST);
+    }
+
+
     @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -180,11 +191,7 @@ public class EqualizerFragment extends Fragment {
         fragTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-// 设置Intent的类型为音乐类型
-                intent.setType("audio/*");
-// 启动音乐选择器
-                requireActivity().startActivityForResult(intent, PICK_MUSIC_REQUEST);
+                chooseMusic(requireActivity());
             }
         });
         fragTitle.setText(title);
@@ -572,8 +579,6 @@ public class EqualizerFragment extends Fragment {
         }
 
     }
-
-
 
 
 }

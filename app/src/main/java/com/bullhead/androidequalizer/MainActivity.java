@@ -1,5 +1,7 @@
 package com.bullhead.androidequalizer;
 
+import static com.bullhead.equalizer.EqualizerFragment.chooseMusic;
+
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     //    @NonNull
     private ViewPager2 id_viewpage;
 
-    private final String[] titles = {"千山万水", "lenka英文", "歌谣"};
+    private final String[] titles = {"选择音乐", "lenka英文", "歌谣"};
     private final int[] colors = {Color.parseColor("#014acf"), Color.parseColor("#f091a6"), Color.parseColor("#d77099")};
     @NonNull
     private ExoPlayer[] mediaPlayers;
@@ -78,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+    View choose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,20 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(SimpleViewModel.class);
         setContentView(R.layout.activity_main);
+        viewModel.observerMusicUri(this, new Observer<Uri>() {
+            @Override
+            public void onChanged(Uri uri) {
+                if (uri != null) {
+                    findViewById(R.id.choose).setVisibility(View.GONE);
+                }
+            }
+        });
+        findViewById(R.id.choose).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseMusic(MainActivity.this);
+            }
+        });
 //        setContentView(R.layout.activity_main);
         root = (View) findViewById(R.id.root);
 
@@ -93,8 +110,11 @@ public class MainActivity extends AppCompatActivity {
         loadEqualizerSettings();
         ////new ExoPlayer[]{EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws)};//MediaPlayer.create(this, R.raw.qsws);
 
-        setMediaPlayers();
-        id_viewpage.setUserInputEnabled(mediaPlayers.length > 1);
+//        if(viewModel.getMusicUri() == null){
+//
+//        }
+//        setMediaPlayers();
+        id_viewpage.setUserInputEnabled(false);
 
         viewModel.observerMusicUri(this, new Observer<Uri>() {
             @Override
@@ -102,8 +122,10 @@ public class MainActivity extends AppCompatActivity {
                 if (uri != null) {
 
 //                    mediaPlayers[0].pause();
-                    mediaPlayers[0].stop();
-                    mediaPlayers[0].release();
+                    if (mediaPlayers != null && mediaPlayers.length > 0) {
+                        mediaPlayers[0].stop();
+                        mediaPlayers[0].release();
+                    }
                     oneMusic = uri.toString();//EnableViewModel.exoPlaySImple(MainActivity.this, MainActivity.this, uri.toString());
                     setMediaPlayers();
                 }
