@@ -188,12 +188,13 @@ public class EqualizerFragment extends Fragment {
         });
 
         fragTitle = view.findViewById(R.id.equalizer_fragment_title);
-        fragTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                chooseMusic(requireActivity());
-            }
-        });
+//        fragTitle.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                chooseMusic(requireActivity());
+//            }
+//        });
+        fragTitle.setVisibility(View.GONE);
         fragTitle.setText(title);
 
         equalizerSwitch = view.findViewById(R.id.equalizer_switch);

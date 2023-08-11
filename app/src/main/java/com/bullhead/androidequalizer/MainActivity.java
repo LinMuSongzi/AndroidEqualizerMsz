@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -55,7 +56,15 @@ public class MainActivity extends AppCompatActivity {
     //    @NonNull
     private ViewPager2 id_viewpage;
 
-    private final String[] titles = {"选择音乐", "lenka英文", "歌谣"};
+    //    private final String[] titles = {"浪漫海贝", "lenka英文", "歌谣"};
+    public static final String[] titles = {"浪漫海贝", "清洁耳朵", "溪边虫鸣", "钢琴曲7", "雨打芭蕉"};
+
+    public static final String[] uri = {instanceUriStr(R.raw.lmhb), instanceUriStr(R.raw.qjed), instanceUriStr(R.raw.xbcm), instanceUriStr(R.raw.gqq7), instanceUriStr(R.raw.ydbj)};
+
+    private static String instanceUriStr(int res) {
+        return String.format("android.resource://%s/%d", MainApplication.getMain().getPackageName(), res);
+    }
+
     private final int[] colors = {Color.parseColor("#014acf"), Color.parseColor("#f091a6"), Color.parseColor("#d77099")};
     @NonNull
     private ExoPlayer[] mediaPlayers;
@@ -92,14 +101,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(Uri uri) {
                 if (uri != null) {
-                    findViewById(R.id.choose).setVisibility(View.GONE);
+//                    findViewById(R.id.choose).setVisibility(View.GONE);
                 }
             }
         });
         findViewById(R.id.choose).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chooseMusic(MainActivity.this);
+               new ChooseRawDialogFragment(R.layout.dialog_recycle).show(getSupportFragmentManager(),"haha");
+//                chooseMusic(MainActivity.this);
             }
         });
 //        setContentView(R.layout.activity_main);
@@ -129,6 +139,18 @@ public class MainActivity extends AppCompatActivity {
                     oneMusic = uri.toString();//EnableViewModel.exoPlaySImple(MainActivity.this, MainActivity.this, uri.toString());
                     setMediaPlayers();
                 }
+            }
+        });
+
+        viewModel.observerChoosePosition(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewModel.setMusicUri(Uri.parse(uri[integer]));
+                    }
+                });
             }
         });
 

@@ -18,6 +18,14 @@ class SimpleViewModel(var savedStateHandle: SavedStateHandle) : ViewModel() {
             savedStateHandle["musicUri"] = value
         }
 
+    var position: Int
+        get() {
+            return savedStateHandle["position"] ?: -1
+        }
+        set(value) {
+            savedStateHandle["position"] = position
+        }
+
     companion object {
         const val REMARK_LIST_KEY = "getLifeRemarkList"
     }
@@ -34,6 +42,10 @@ class SimpleViewModel(var savedStateHandle: SavedStateHandle) : ViewModel() {
 
     fun observerMusicUri(lifecycleOwner: LifecycleOwner, observer: Observer<Uri?>) {
         savedStateHandle.getLiveData<Uri?>("musicUri").observe(lifecycleOwner, observer)
+    }
+
+    fun observerChoosePosition(lifecycleOwner: LifecycleOwner, observer: Observer<Int>) {
+        savedStateHandle.getLiveData<Int>("position").observe(lifecycleOwner, observer)
     }
 
 
