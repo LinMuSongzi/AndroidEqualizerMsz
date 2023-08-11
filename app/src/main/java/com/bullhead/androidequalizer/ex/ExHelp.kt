@@ -53,7 +53,7 @@ class ExHelp private constructor() : LifecycleEventObserver, IController, IHolde
     }
 
     private fun onCreate(source: LifecycleOwner) {
-        controllers = arrayOf(AudioController(), VideoController())
+//        controllers = arrayOf(AudioController(), VideoController())
         source.lifecycle.addObserver(getAudioController())
         source.lifecycle.addObserver(getVideoController())
     }
