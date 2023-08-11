@@ -3,6 +3,7 @@ package com.bullhead.equalizer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -52,6 +53,7 @@ public class EqualizerFragment extends Fragment {
     private static final String TAG = "EqualizerFragment";
 
     public static final String ARG_AUDIO_SESSIOIN_ID = "audio_session_id";
+    public static final int PICK_MUSIC_REQUEST = 0x98;
     int themeColor2 = Color.parseColor("#B24242");
     static int themeColor = Color.parseColor("#B24242");
     public Equalizer mEqualizer;
@@ -175,6 +177,16 @@ public class EqualizerFragment extends Fragment {
         });
 
         fragTitle = view.findViewById(R.id.equalizer_fragment_title);
+        fragTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+// 设置Intent的类型为音乐类型
+                intent.setType("audio/*");
+// 启动音乐选择器
+                requireActivity().startActivityForResult(intent, PICK_MUSIC_REQUEST);
+            }
+        });
         fragTitle.setText(title);
 
         equalizerSwitch = view.findViewById(R.id.equalizer_switch);
@@ -560,6 +572,8 @@ public class EqualizerFragment extends Fragment {
         }
 
     }
+
+
 
 
 }

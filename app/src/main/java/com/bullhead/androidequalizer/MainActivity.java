@@ -1,15 +1,19 @@
 package com.bullhead.androidequalizer;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.DatabaseUtils;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -29,6 +33,7 @@ import com.bullhead.equalizer.EqualizerFragment;
 import com.bullhead.equalizer.EqualizerModel;
 import com.bullhead.equalizer.Settings;
 import com.bullhead.equalizer.SettingsArray;
+import com.bullhead.equalizer.SimpleViewModel;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
 import com.google.gson.Gson;
@@ -45,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int NUMBER = 3;
 
-    @NonNull
+    //    @NonNull
     private ViewPager2 id_viewpage;
 
     private final String[] titles = {"千山万水", "lenka英文", "歌谣"};
@@ -59,27 +64,56 @@ public class MainActivity extends AppCompatActivity {
 //    };
     @NonNull
     EnableViewModel vm;
-    private View root;
+    private SimpleViewModel viewModel;
+    //    private View root;
+    View root;
+
+    String oneMusic = "android.resource://" + getPackageName() + "/" + R.raw.qsws;
 
     private ExoPlayer[] sum3() {
         return new ExoPlayer[]{
-                EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws)//MediaPlayer.create(this, R.raw.qsws);
+                EnableViewModel.exoPlaySImple(this, this, oneMusic)//MediaPlayer.create(this, R.raw.qsws);
 //                ,EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.shh)
 //                ,EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.th)
         };
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        viewModel = new ViewModelProvider(this).get(SimpleViewModel.class);
         setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_main);
         root = (View) findViewById(R.id.root);
 
         id_viewpage = findViewById(R.id.id_viewpage);
         vm = new ViewModelProvider(this).get(EnableViewModel.class);
         loadEqualizerSettings();
-        mediaPlayers = sum3();//new ExoPlayer[]{EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws)};//MediaPlayer.create(this, R.raw.qsws);
+        ////new ExoPlayer[]{EnableViewModel.exoPlaySImple(this, this, "android.resource://" + getPackageName() + "/" + R.raw.qsws)};//MediaPlayer.create(this, R.raw.qsws);
 
+        setMediaPlayers();
+        id_viewpage.setUserInputEnabled(mediaPlayers.length > 1);
+
+        viewModel.observerMusicUri(this, new Observer<Uri>() {
+            @Override
+            public void onChanged(Uri uri) {
+                if (uri != null) {
+
+//                    mediaPlayers[0].pause();
+                    mediaPlayers[0].stop();
+                    mediaPlayers[0].release();
+                    oneMusic = uri.toString();//EnableViewModel.exoPlaySImple(MainActivity.this, MainActivity.this, uri.toString());
+                    setMediaPlayers();
+                }
+            }
+        });
+
+    }
+
+    private void setMediaPlayers() {
+        mediaPlayers = sum3();
         foreach((exoPlayer, index) -> {
             if (exoPlayer != null) {
                 Log.i(TAG, "foreach: " + exoPlayer);
@@ -92,12 +126,18 @@ public class MainActivity extends AppCompatActivity {
             return null;
         });
 
-//        initPage();
-
     }
 
     private void initPage() {
         id_viewpage.setOffscreenPageLimit(100);
+//        id_viewpage.requestDisallowInterceptTouchEvent();
+        id_viewpage.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+
         id_viewpage.setAdapter(new FragmentStateAdapter(this) {
             @NonNull
             @Override
@@ -193,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             foreach((exoPlayer, integer) -> {
                 if (exoPlayer != null && !exoPlayer.isPlaying()) {
-                    root.postDelayed(() -> exoPlayer.play(), 1000);
+                    root.postDelayed(exoPlayer::play, 1000);
                 }
                 return null;
             });
@@ -265,5 +305,17 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String PREF_KEY = "equalizer";
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == EqualizerFragment.PICK_MUSIC_REQUEST && resultCode == RESULT_OK) {
+            // 获取选择的音乐的URI
+            Uri selectedMusicUri = data.getData();
+            // 处理选择的音乐
+            // ...
+            viewModel.setMusicUri(selectedMusicUri);
+        }
+    }
 
 }

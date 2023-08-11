@@ -1,13 +1,22 @@
-package com.bullhead.androidequalizer
+package com.bullhead.equalizer
 
+import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.createSavedStateHandle
 import java.io.Serializable
 
 class SimpleViewModel(var savedStateHandle: SavedStateHandle) : ViewModel() {
+
+
+    var musicUri: Uri?
+        get() {
+            return savedStateHandle.get("musicUri")
+        }
+        set(value) {
+            savedStateHandle["musicUri"] = value
+        }
 
     companion object {
         const val REMARK_LIST_KEY = "getLifeRemarkList"
@@ -21,6 +30,10 @@ class SimpleViewModel(var savedStateHandle: SavedStateHandle) : ViewModel() {
 
     fun observerRemarkList(lifecycleOwner: LifecycleOwner, observer: Observer<List<CharSequence>>) {
         savedStateHandle.getLiveData<List<CharSequence>>(REMARK_LIST_KEY).observe(lifecycleOwner, observer)
+    }
+
+    fun observerMusicUri(lifecycleOwner: LifecycleOwner, observer: Observer<Uri?>) {
+        savedStateHandle.getLiveData<Uri?>("musicUri").observe(lifecycleOwner, observer)
     }
 
 
