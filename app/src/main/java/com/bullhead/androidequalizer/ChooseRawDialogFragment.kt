@@ -16,6 +16,10 @@ class ChooseRawDialogFragment(dialog:Int) : DialogFragment(dialog) {
 
     lateinit var id_recycle: RecyclerView;
 
+    private val choosePositions = intArrayOf(-1,-1,-1)
+
+    var lastIndex = 0;
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         id_recycle = view.findViewById(R.id.id_recycle)
@@ -34,7 +38,17 @@ class ChooseRawDialogFragment(dialog:Int) : DialogFragment(dialog) {
             override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
                 (holder.itemView as TextView).text = title[position]
                 holder.itemView.setOnClickListener {
-                    ViewModelProvider(requireActivity())[SimpleViewModel::class.java].position = position
+
+
+//                    for((index, value) in choosePositions.withIndex()){
+//                        if(value == -1){
+//                            choosePositions[index] = position
+//                            lastIndex = position
+//                        }
+//                    }
+
+
+                    ViewModelProvider(requireActivity())[SimpleViewModel::class.java].position = intArrayOf(position)
                     dismiss()
                 }
             }

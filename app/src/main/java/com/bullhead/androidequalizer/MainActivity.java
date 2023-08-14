@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     //    private View root;
     View root;
 
-    String oneMusic = "android.resource://" + getPackageName() + "/" + R.raw.qsws;
+    String oneMusic = "android.resource://" + MainApplication.getMain().getPackageName() + "/" + R.raw.qsws;
 
     private ExoPlayer[] sum3() {
         return new ExoPlayer[]{
@@ -142,13 +142,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        viewModel.observerChoosePosition(this, new Observer<Integer>() {
+        viewModel.observerChoosePosition(this, new Observer<int[]>() {
             @Override
-            public void onChanged(Integer integer) {
+            public void onChanged(int[] ints) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        viewModel.setMusicUri(Uri.parse(uri[integer]));
+                        viewModel.setMusicUri(Uri.parse(uri[ints[0]]));
                     }
                 });
             }

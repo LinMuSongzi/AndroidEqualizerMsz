@@ -18,12 +18,12 @@ class SimpleViewModel(var savedStateHandle: SavedStateHandle) : ViewModel() {
             savedStateHandle["musicUri"] = value
         }
 
-    var position: Int
+    var position: IntArray
         get() {
-            return savedStateHandle["position"] ?: -1
+            return savedStateHandle["position"] ?: intArrayOf(-1)
         }
         set(value) {
-            savedStateHandle["position"] = position
+            savedStateHandle["position"] = value
         }
 
     companion object {
@@ -44,8 +44,8 @@ class SimpleViewModel(var savedStateHandle: SavedStateHandle) : ViewModel() {
         savedStateHandle.getLiveData<Uri?>("musicUri").observe(lifecycleOwner, observer)
     }
 
-    fun observerChoosePosition(lifecycleOwner: LifecycleOwner, observer: Observer<Int>) {
-        savedStateHandle.getLiveData<Int>("position").observe(lifecycleOwner, observer)
+    fun observerChoosePosition(lifecycleOwner: LifecycleOwner, observer: Observer<IntArray>) {
+        savedStateHandle.getLiveData<IntArray>("position").observe(lifecycleOwner, observer)
     }
 
 
