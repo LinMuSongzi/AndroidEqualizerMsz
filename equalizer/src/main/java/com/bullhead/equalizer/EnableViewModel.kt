@@ -19,12 +19,29 @@ import com.google.android.exoplayer2.audio.DefaultAudioSink
 
 class EnableViewModel : ViewModel() {
 
+    val environmentalReverbsLivedata = MutableLiveData<Int>()
+
+    val environmentalReverbs = mutableListOf<EnvironmentalReverbInfo>()
+
 
     val seesionId = Array(3) {
         MutableLiveData<Int>()
     }
 
     val enable = MutableLiveData<Boolean>()
+
+    data class EnvironmentalReverbInfo(
+        var title:String = "",
+        var maxProx:Int = 0,
+        var startPox:Int,
+        var plusSum:Int,
+
+        var thisProx:Int = 0
+
+
+
+
+    )
 
 
     companion object {

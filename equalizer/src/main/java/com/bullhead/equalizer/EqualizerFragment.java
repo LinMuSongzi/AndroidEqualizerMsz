@@ -121,7 +121,7 @@ public class EqualizerFragment extends Fragment {
 
         if (Settings.indexBy(index).equalizerModel == null) {
             Settings.indexBy(index).equalizerModel = new EqualizerModel();
-            Settings.indexBy(index).equalizerModel.setReverbPreset(PresetReverb.PRESET_NONE);
+            Settings.indexBy(index).equalizerModel.setReverbPreset(PresetReverb.PRESET_LARGEHALL);
             Settings.indexBy(index).equalizerModel.setBassStrength((short) (1000 / 19));
         }
 
