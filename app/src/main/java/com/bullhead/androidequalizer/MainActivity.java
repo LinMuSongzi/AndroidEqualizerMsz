@@ -47,9 +47,9 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager2 id_viewpage;
 
     //    private final String[] titles = {"浪漫海贝", "lenka英文", "歌谣"};
-    public static final String[] titles = {"千山万水-jay", "回到过去-jay", "浪漫海贝", "清洁耳朵", "溪边虫鸣", "钢琴曲7", "雨打芭蕉"};
+    public static final String[] titles = {"千山万水-jay", "回到过去-jay","英文歌曲", "浪漫海贝", "清洁耳朵", "溪边虫鸣", "钢琴曲7", "雨打芭蕉"};
 
-    public static final String[] uri = {instanceUriStr(R.raw.qsws), instanceUriStr(R.raw.hdgq), instanceUriStr(R.raw.lmhb), instanceUriStr(R.raw.qjed), instanceUriStr(R.raw.xbcm), instanceUriStr(R.raw.gqq7), instanceUriStr(R.raw.ydbj)};
+    public static final String[] uri = {instanceUriStr(R.raw.qsws), instanceUriStr(R.raw.hdgq),instanceUriStr(R.raw.lenka), instanceUriStr(R.raw.lmhb), instanceUriStr(R.raw.qjed), instanceUriStr(R.raw.xbcm), instanceUriStr(R.raw.gqq7), instanceUriStr(R.raw.ydbj)};
 
     private static String instanceUriStr(int res) {
         return String.format("android.resource://%s/%d", MainApplication.getMain().getPackageName(), res);
