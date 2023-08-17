@@ -3,7 +3,7 @@ package com.bullhead.equalizer;
 import java.util.ArrayList;
 
 public class Settings {
-    public  boolean        isEqualizerEnabled  = true;
+    public  boolean        isEqualizerEnabled  = false;
     public  boolean        isEqualizerReloaded = true;
     public  int[]          seekbarpos          = new int[5];
     public  int            presetPos;

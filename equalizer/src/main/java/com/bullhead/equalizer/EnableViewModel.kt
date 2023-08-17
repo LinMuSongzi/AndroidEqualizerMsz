@@ -28,7 +28,7 @@ class EnableViewModel : ViewModel() {
         MutableLiveData<Int>()
     }
 
-    val enable = MutableLiveData<Boolean>()
+    val enable = MutableLiveData<Boolean>(false)
 
     data class EnvironmentalReverbInfo(
         var title:String = "",

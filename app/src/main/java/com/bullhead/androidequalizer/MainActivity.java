@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-        DefaultLifecycleObserver[] defaultLifecycleObservers = {new HandlerVirtualizerLifecycle(vm), new EnvironmentalReverbLifecycle(vm)};
+        DefaultLifecycleObserver[] defaultLifecycleObservers = {new EnvironmentalReverbLifecycle(vm)};
 
 
         vm.getSeesionId()[0].observe(this, integer -> {
