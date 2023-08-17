@@ -2,19 +2,12 @@ package com.bullhead.androidequalizer
 
 import android.media.audiofx.AudioEffect
 import android.media.audiofx.EnvironmentalReverb
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.bullhead.equalizer.EnableViewModel
-import com.bullhead.equalizer.EnableViewModel.Companion.observerEnable
-import java.lang.Compiler.enable
-import java.lang.ref.WeakReference
-import java.util.Arrays
 
-class HandlerEnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudioEffectLifecycle<EnvironmentalReverb>(viewModel) {
+class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudioEffectLifecycle<EnvironmentalReverb>(viewModel) {
 
 
 
