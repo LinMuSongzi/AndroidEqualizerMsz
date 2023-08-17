@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.choose).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               new ChooseRawDialogFragment(R.layout.dialog_recycle).show(getSupportFragmentManager(),"haha");
+                new ChooseRawDialogFragment(R.layout.dialog_recycle).show(getSupportFragmentManager(), "haha");
 //                chooseMusic(MainActivity.this);
             }
         });
@@ -155,14 +155,15 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-//        DefaultLifecycleObserver defaultLifecycleObserver =  new HandlerEnvironmentalReverbLifecycle(vm);
-//        vm.getSeesionId()[0].observe(this, new Observer<Integer>() {
-//            @Override
-//            public void onChanged(Integer integer) {
-//                getLifecycle().removeObserver(defaultLifecycleObserver);
-//                getLifecycle().addObserver(defaultLifecycleObserver);
-//            }
-//        });
+        DefaultLifecycleObserver[] defaultLifecycleObservers = {new HandlerEnvironmentalReverbLifecycle(vm), new HandlerVirtualizerLifecycle(vm)};
+
+
+        vm.getSeesionId()[0].observe(this, integer -> {
+            for (DefaultLifecycleObserver df : defaultLifecycleObservers) {
+                getLifecycle().removeObserver(df);
+                getLifecycle().addObserver(df);
+            }
+        });
     }
 
     private void setMediaPlayers() {

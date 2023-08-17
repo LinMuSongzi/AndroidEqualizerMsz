@@ -61,7 +61,7 @@ public class EqualizerFragment extends Fragment {
     SwitchCompat equalizerSwitch;
     public BassBoost bassBoost;
     LineChartView chart;
-    public PresetReverb presetReverb;
+//    public PresetReverb presetReverb;
     ImageView backBtn;
 
     int y = 0;
@@ -134,9 +134,9 @@ public class EqualizerFragment extends Fragment {
         bassBoostSetting.strength = Settings.indexBy(index).equalizerModel.getBassStrength();
         bassBoost.setProperties(bassBoostSetting);
 
-        presetReverb = new PresetReverb(0, audioSesionId);
-        presetReverb.setPreset(Settings.indexBy(index).equalizerModel.getReverbPreset());
-        presetReverb.setEnabled(Settings.indexBy(index).isEqualizerEnabled);
+//        presetReverb = new PresetReverb(0, audioSesionId);
+//        presetReverb.setPreset(Settings.indexBy(index).equalizerModel.getReverbPreset());
+//        presetReverb.setEnabled(Settings.indexBy(index).isEqualizerEnabled);
 
         mEqualizer.setEnabled(Settings.indexBy(index).isEqualizerEnabled);
 
@@ -205,7 +205,7 @@ public class EqualizerFragment extends Fragment {
                 new ViewModelProvider(requireActivity()).get(EnableViewModel.class).getEnable().setValue(isChecked);
                 mEqualizer.setEnabled(isChecked);
                 bassBoost.setEnabled(isChecked);
-                presetReverb.setEnabled(isChecked);
+//                presetReverb.setEnabled(isChecked);
                 Settings.indexBy(index).isEqualizerEnabled = isChecked;
                 Settings.indexBy(index).equalizerModel.setEqualizerEnabled(isChecked);
             }
@@ -251,13 +251,13 @@ public class EqualizerFragment extends Fragment {
                 }
             }
 
-            if (presetReverb != null) {
-                try {
-                    y = (presetReverb.getPreset() * 19) / 6;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+//            if (presetReverb != null) {
+//                try {
+//                    y = (presetReverb.getPreset() * 19) / 6;
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
 
             if (x == 0) {
                 bassController.setProgress(1);
@@ -305,7 +305,7 @@ public class EqualizerFragment extends Fragment {
                 Settings.indexBy(index).reverbPreset = (short) ((progress * 6) / 19);
                 Settings.indexBy(index).equalizerModel.setReverbPreset(Settings.indexBy(index).reverbPreset);
                 try {
-                    presetReverb.setPreset(Settings.indexBy(index).reverbPreset);
+//                    presetReverb.setPreset(Settings.indexBy(index).reverbPreset);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -532,9 +532,9 @@ public class EqualizerFragment extends Fragment {
             bassBoost.release();
         }
 
-        if (presetReverb != null) {
-            presetReverb.release();
-        }
+//        if (presetReverb != null) {
+//            presetReverb.release();
+//        }
 
         Settings.indexBy(index).isEditing = false;
     }

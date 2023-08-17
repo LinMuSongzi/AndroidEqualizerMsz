@@ -1,65 +1,37 @@
 package com.bullhead.androidequalizer
 
+import android.media.audiofx.AudioEffect
 import android.media.audiofx.Virtualizer
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import com.bullhead.equalizer.EnableViewModel
-import com.bullhead.equalizer.EnableViewModel.Companion.observerEnable
-import java.lang.ref.WeakReference
 
-class HandlerVirtualizerLifecycle( val viewModel: EnableViewModel) : DefaultLifecycleObserver, Runnable {
+class HandlerVirtualizerLifecycle(viewModel: EnableViewModel) : BaseHandlerAudioEffectLifecycle<Virtualizer>(viewModel) {
 
-    companion object {
-        const val TAG = "Virtualizer"
+    var lenght: Short = 1000;
+
+
+    override fun initRun(mAudioEffect: AudioEffect, owner: LifecycleOwner) {
+        run()
     }
 
-
-    private lateinit var virtualizer: Virtualizer
-    private var value: Short = 0;
-    val handler = Handler(Looper.getMainLooper())
-
-    override fun onCreate(owner: LifecycleOwner) {
-        viewModel.seesionId[0].observe(owner){
-            it?.apply {
-                virtualizer = Virtualizer(0, it)
-                virtualizer.enabled = true
-
-                Log.i(TAG, "onCreate: virtualizer2.enabled  = "+virtualizer.enabled)
-                Log.i(TAG, "onCreate: virtualizer2.roundedStrength  = "+virtualizer.roundedStrength)
-                Log.i(TAG, "onCreate: virtualizer2.properties  = "+virtualizer.properties)
-                Log.i(TAG, "onCreate: virtualizer2.strengthSupported  = "+virtualizer.strengthSupported)
-                virtualizer.observerEnable(owner,viewModel)
-            }
-        }
-
-    }
-
-    override fun onResume(owner: LifecycleOwner) {
-        handler.removeCallbacks(this)
-        handler.post(this)
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        handler.removeCallbacks(this)
-    }
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        virtualizer.release()
-    }
+    override fun createAudioEffect(audioId: Int) = Virtualizer(0, audioId)
 
     override fun run() {
-        Log.i(TAG, "run: value = $value")
-        if(this::virtualizer.isInitialized) {
-            virtualizer.setStrength(value)
-            value = value.plus(100).toShort()
-            if (value.toInt() >= 1000 + 100) {
-                value = 0
-            }
-            handler.postDelayed(this, 200)
-        }
+        val mVirtualizer = mAudioEffect ?: return
+
+        Log.d(TAG, "run: mVirtualizer = $mVirtualizer , lenght = $lenght , isEnable = ${mVirtualizer.enabled}")
+
+        // 设置强度级别
+        mVirtualizer.setStrength(lenght) // 在0到1000之间，以毫贝为单位
+
+        lenght = (Math.random() * 1000).toInt().toShort()
+//        mVirtualizer!!.enabled = true
+        handler.postDelayed(this, 1000)
+
+//        mVirtualizer.(1.0f)
+
     }
 
 
