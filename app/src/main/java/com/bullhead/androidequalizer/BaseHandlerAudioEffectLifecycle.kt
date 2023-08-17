@@ -17,7 +17,12 @@ abstract class BaseHandlerAudioEffectLifecycle<T:AudioEffect>(protected val view
     }
 
     protected val handler = Handler(Looper.getMainLooper())
-    protected var mAudioEffect:T? = null
+    private var mAudioEffect:T? = null
+
+    val  audioEffect:T?
+        get() {
+            return mAudioEffect
+        }
 
     override fun onCreate(owner: LifecycleOwner) {
         viewModel.seesionId[0].observe(owner) {

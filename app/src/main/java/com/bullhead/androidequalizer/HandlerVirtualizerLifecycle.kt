@@ -19,7 +19,7 @@ class HandlerVirtualizerLifecycle(viewModel: EnableViewModel) : BaseHandlerAudio
     override fun createAudioEffect(audioId: Int) = Virtualizer(0, audioId)
 
     override fun run() {
-        val mVirtualizer = mAudioEffect ?: return
+        val mVirtualizer = audioEffect ?: return
 
         Log.d(TAG, "run: mVirtualizer = $mVirtualizer , lenght = $lenght , isEnable = ${mVirtualizer.enabled}")
 

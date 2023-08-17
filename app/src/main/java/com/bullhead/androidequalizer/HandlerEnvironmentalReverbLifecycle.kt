@@ -43,7 +43,7 @@ class HandlerEnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHand
     override fun createAudioEffect(audioId: Int): EnvironmentalReverb  = EnvironmentalReverb(0, audioId)
 
     override fun run() {
-        val reverb = mAudioEffect ?: return
+        val reverb = audioEffect ?: return
 
         Log.d(TAG, "run: environmentalReverbs = ${viewModel.environmentalReverbs.toTypedArray().contentToString()}")
 
