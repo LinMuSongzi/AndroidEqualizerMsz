@@ -41,7 +41,10 @@ class EnableViewModel : ViewModel() {
         var plusSum: Int,
 
         var thisProx: Int = 0,
-        var position: Int = 0
+        var position: Int = 0,
+
+        var tag:String,
+        var detail:String? = ""
 
 
     ) {

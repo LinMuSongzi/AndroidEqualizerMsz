@@ -1,6 +1,8 @@
 package com.bullhead.androidequalizer
 
 import android.annotation.SuppressLint
+import android.graphics.Canvas
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,7 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bullhead.equalizer.EnableViewModel
 
-class EnvironmentalReverbDialog : DialogFragment() {
+class EnvironmentalReverbDialog : BaseDialogFragment() {
+
 
     private val viewModel: EnableViewModel?
         get() {
@@ -31,9 +34,22 @@ class EnvironmentalReverbDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<RecyclerView>(R.id.id_recycle)?.apply  recycleview@{
+        view.findViewById<RecyclerView>(R.id.id_recycle)?.apply recycleview@{
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             val size = (viewModel?.environmentalReverbs?.size) ?: 0
+            addItemDecoration(object : RecyclerView.ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    super.getItemOffsets(outRect, view, parent, state)
+                    if (parent.getChildLayoutPosition(view) != 0) {
+                        outRect.top = 20//context.resources.getDimensionPixelSize(R.dimen.test_10dp)
+                    }
+                }
+            })
             adapter = object : RecyclerView.Adapter<ViewHolder>() {
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
                     return object : ViewHolder(LayoutInflater.from(requireContext()).inflate(R.layout.item_environmental_reverb, parent, false)) {}
@@ -46,10 +62,10 @@ class EnvironmentalReverbDialog : DialogFragment() {
                     holder.itemView.findViewById<SeekBar>(R.id.verticalSeekBar).apply {
                         progress = info.thisProx
                         max = info.maxProx + info.plusSum
-                        id_values.text = "progress = ${info.thisProx}"
+                        textTag(id_values, info)
                         setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                                if(fromUser){
+                                if (fromUser) {
                                     id_values.text = "progress = ${progress - info.plusSum}"
                                 }
                             }
@@ -64,17 +80,23 @@ class EnvironmentalReverbDialog : DialogFragment() {
 //                                viewModel?.environmentalReverbsLivedata?.value = 1
                                 viewModel?.currentEnvironmentalReverbInfo?.value = info
 //                                this@recycleview.adapter?.notifyItemChanged(position)
-                                id_values.text = "progress = ${info.thisProx - info.plusSum}"
+                                textTag(id_values, info)
                             }
 
                         })
                     }
-                    holder.itemView.findViewById<TextView>(R.id.id_title).text = viewModel?.environmentalReverbs!![position].title
+                    holder.itemView.findViewById<TextView>(R.id.id_title).text =
+                        viewModel?.environmentalReverbs!![position].title + " 范围 [${info.startPox},${info.maxProx}] ${info.tag}"
+                    holder.itemView.findViewById<TextView>(R.id.id_detail).text = "${info.detail}"
                 }
 
             }
         }
 
+    }
+
+    private fun textTag(textView: TextView, info: EnableViewModel.EnvironmentalReverbInfo) {
+        textView.text = "progress = ${info.thisProx - info.plusSum}"
     }
 
 }
