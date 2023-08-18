@@ -1,5 +1,6 @@
 package com.bullhead.androidequalizer
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,7 +31,7 @@ class EnvironmentalReverbDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<RecyclerView>(R.id.id_recycle)?.apply {
+        view.findViewById<RecyclerView>(R.id.id_recycle)?.apply  recycleview@{
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             val size = (viewModel?.environmentalReverbs?.size) ?: 0
             adapter = object : RecyclerView.Adapter<ViewHolder>() {
@@ -39,25 +40,31 @@ class EnvironmentalReverbDialog : DialogFragment() {
                 }
 
                 override fun getItemCount(): Int = size
-                override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+                override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
                     val info = viewModel?.environmentalReverbs!![position]
+                    val id_values = holder.itemView.findViewById<TextView>(R.id.id_values)
                     holder.itemView.findViewById<SeekBar>(R.id.verticalSeekBar).apply {
-                        progress = info.thisProx + info.plusSum
+                        progress = info.thisProx
                         max = info.maxProx + info.plusSum
+                        id_values.text = "progress = ${info.thisProx}"
                         setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-
-
+                                if(fromUser){
+                                    id_values.text = "progress = ${progress - info.plusSum}"
+                                }
                             }
 
                             override fun onStartTrackingTouch(seekBar: SeekBar?) {
 
                             }
 
-                            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                            override fun onStopTrackingTouch(seekBar: SeekBar) {
                                 Log.d("onStopTrackingTouch", "onStopTrackingTouch: ${info.title} , thisProx =  ${progress - info.plusSum}")
-                                info.thisProx = progress - info.plusSum
-                                viewModel?.environmentalReverbsLivedata?.value = 1
+                                info.thisProx = seekBar.progress
+//                                viewModel?.environmentalReverbsLivedata?.value = 1
+                                viewModel?.currentEnvironmentalReverbInfo?.value = info
+//                                this@recycleview.adapter?.notifyItemChanged(position)
+                                id_values.text = "progress = ${info.thisProx - info.plusSum}"
                             }
 
                         })

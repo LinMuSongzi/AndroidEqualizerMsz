@@ -2,6 +2,7 @@ package com.bullhead.equalizer
 
 import android.content.Context
 import android.media.audiofx.AudioEffect
+import android.media.audiofx.EnvironmentalReverb
 import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -23,6 +24,7 @@ class EnableViewModel : ViewModel() {
 
     val environmentalReverbs = mutableListOf<EnvironmentalReverbInfo>()
 
+    var currentEnvironmentalReverbInfo = MutableLiveData<EnvironmentalReverbInfo>()
 
     val seesionId = Array(3) {
         MutableLiveData<Int>()
@@ -31,17 +33,23 @@ class EnableViewModel : ViewModel() {
     val enable = MutableLiveData<Boolean>(false)
 
     data class EnvironmentalReverbInfo(
-        var title:String = "",
-        var maxProx:Int = 0,
-        var startPox:Int,
-        var plusSum:Int,
-
-        var thisProx:Int = 0
 
 
+        var title: String = "",
+        var maxProx: Int = 0,
+        var startPox: Int,
+        var plusSum: Int,
+
+        var thisProx: Int = 0,
+        var position: Int = 0
 
 
-    )
+    ) {
+
+        var callMethod: ((EnvironmentalReverb?) -> Unit)? = null
+
+
+    }
 
 
     companion object {
