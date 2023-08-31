@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioCapabilities
 import com.google.android.exoplayer2.audio.AudioProcessor
 import com.google.android.exoplayer2.audio.AudioSink
+import com.google.android.exoplayer2.audio.BaseAudioProcessor
 import com.google.android.exoplayer2.audio.DefaultAudioSink
 
 class EnableViewModel : ViewModel() {
@@ -85,7 +86,7 @@ class EnableViewModel : ViewModel() {
                          * 设置SoxAudioProcessor
                          * 处理音频数据
                          */
-                        //.setAudioProcessors(arrayOf(audioProcessor))
+//                        .setAudioProcessors(arrayOf(LoadAudioProcessor()))
                         .setOffloadMode(
                             if (enableOffload) DefaultAudioSink.OFFLOAD_MODE_ENABLED_GAPLESS_REQUIRED else DefaultAudioSink.OFFLOAD_MODE_DISABLED
                         )

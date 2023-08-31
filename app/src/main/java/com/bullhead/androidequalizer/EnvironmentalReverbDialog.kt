@@ -31,6 +31,12 @@ class EnvironmentalReverbDialog : BaseDialogFragment() {
         return inflater.inflate(R.layout.dialog_environmental_reverb, container, false)
     }
 
+
+
+
+
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -76,7 +82,7 @@ class EnvironmentalReverbDialog : BaseDialogFragment() {
 
                             override fun onStopTrackingTouch(seekBar: SeekBar) {
                                 Log.d("onStopTrackingTouch", "onStopTrackingTouch: ${info.title} , thisProx =  ${progress - info.plusSum}")
-                                info.thisProx = seekBar.progress
+                                info.thisProx = (seekBar.progress * 1.45).toInt()
 //                                viewModel?.environmentalReverbsLivedata?.value = 1
                                 viewModel?.currentEnvironmentalReverbInfo?.value = info
 //                                this@recycleview.adapter?.notifyItemChanged(position)
