@@ -14,7 +14,7 @@
         android:layout_marginTop="10dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="aksjdlkasjldkj"
+        android:text="title"
         android:textColor="#333333"
         android:textSize="15dp" />
 
@@ -22,7 +22,7 @@
         android:id="@+id/id_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="aksjdlkasjldkj"
+        android:text="详情"
         android:layout_marginVertical="5dp"
         android:textColor="#6C7083"
         android:textSize="12dp" />
@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_height="wrap_content"
-        android:text="aksjdlkasjldkj"
+        android:text="参数值/倍率"
         android:textColor="#666666"
         android:textSize="12dp" />
 
@@ -43,5 +43,12 @@
         android:progress="50"
         tools:max="1000" />
 
+    <SeekBar
+        android:id="@+id/verticalSeekBar2"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:progress="50"
+        tools:max="1000" />
 
 </LinearLayout>

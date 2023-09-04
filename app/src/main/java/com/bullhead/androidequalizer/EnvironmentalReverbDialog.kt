@@ -56,6 +56,13 @@ class EnvironmentalReverbDialog : BaseDialogFragment() {
                     }
                 }
             })
+            addItemDecoration(object :RecyclerView.ItemDecoration(){
+                override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+                    if(parent.getChildItemId(view).toInt()  != (parent.adapter?.itemCount!! -1) ){
+                        outRect.bottom = 5
+                    }
+                }
+            })
             adapter = object : RecyclerView.Adapter<ViewHolder>() {
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
                     return object : ViewHolder(LayoutInflater.from(requireContext()).inflate(R.layout.item_environmental_reverb, parent, false)) {}
@@ -82,7 +89,7 @@ class EnvironmentalReverbDialog : BaseDialogFragment() {
 
                             override fun onStopTrackingTouch(seekBar: SeekBar) {
                                 Log.d("onStopTrackingTouch", "onStopTrackingTouch: ${info.title} , thisProx =  ${progress - info.plusSum}")
-                                info.thisProx = (seekBar.progress * 1.45).toInt()
+                                info.thisProx = (seekBar.progress * info.multiplying).toInt()
 //                                viewModel?.environmentalReverbsLivedata?.value = 1
                                 viewModel?.currentEnvironmentalReverbInfo?.value = info
 //                                this@recycleview.adapter?.notifyItemChanged(position)
@@ -91,6 +98,29 @@ class EnvironmentalReverbDialog : BaseDialogFragment() {
 
                         })
                     }
+
+                    holder.itemView.findViewById<SeekBar>(R.id.verticalSeekBar2).apply{
+                        this.max = 30
+                        progress = info.multiplying.toInt() * 10
+                        textTag(id_values, info)
+                        setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
+                            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+
+                            }
+
+                            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+                            }
+
+                            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                                info.multiplying = seekBar.progress.toFloat() / 10
+                                viewModel?.currentEnvironmentalReverbInfo?.value = info
+                                textTag(id_values, info)
+                            }
+
+                        })
+                    }
+
                     holder.itemView.findViewById<TextView>(R.id.id_title).text =
                         viewModel?.environmentalReverbs!![position].title + " 范围 [${info.startPox},${info.maxProx}] ${info.tag}"
                     holder.itemView.findViewById<TextView>(R.id.id_detail).text = "${info.detail}"
@@ -102,7 +132,7 @@ class EnvironmentalReverbDialog : BaseDialogFragment() {
     }
 
     private fun textTag(textView: TextView, info: EnableViewModel.EnvironmentalReverbInfo) {
-        textView.text = "progress = ${info.thisProx - info.plusSum}"
+        textView.text = "progress = ${info.thisProx - info.plusSum}/倍率：${info.multiplying}"
     }
 
 }

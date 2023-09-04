@@ -44,9 +44,11 @@ class EnableViewModel : ViewModel() {
         var thisProx: Int = 0,
         var position: Int = 0,
 
-        var tag:String,
-        var detail:String? = ""
 
+
+        var tag:String,
+        var detail:String? = "",
+        var multiplying:Float = 1f,
 
     ) {
 

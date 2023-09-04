@@ -27,7 +27,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         detail = "这是混响的高频衰减比率"
                     ).apply {
                         callMethod = {
-                            val value = (thisProx - plusSum).toShort()
+                            val value: Short = ((thisProx - plusSum).toShort() * multiplying).toInt().toShort()
 
                             Log.d(TAG, "setDecayHFRatio: max = $maxProx , startPro = $startPox , value =  $value")
                             audioEffect?.decayHFRatio = value
@@ -44,7 +44,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         detail = "这是混响的衰减时间"
                     ).apply {
                         callMethod = {
-                            val value = (thisProx - plusSum)
+                            val value:Int = ((thisProx - plusSum) * multiplying).toInt()
                             Log.d(TAG, "setDecayTime: max = $maxProx , startPro = $startPox , value =  $value")
                             audioEffect?.decayTime = value
                         }
@@ -60,7 +60,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         detail = "这是混响的密度"
                     ).apply {
                         callMethod = {
-                            val value = (thisProx - plusSum).toShort()
+                            val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
                             Log.d(TAG, "setDensity: max = $maxProx , startPro = $startPox , value =  $value")
                             audioEffect?.density = value
                         }
@@ -76,7 +76,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         detail = "是混响的扩散程度"
                     ).apply {
                         callMethod = {
-                            val value = (thisProx - plusSum).toShort()
+                            val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
                             Log.d(TAG, "setDiffusion: max = $maxProx , startPro = $startPox , value =  $value")
                             audioEffect?.diffusion = value
                         }
@@ -92,7 +92,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         detail = "这是首次反射声音的延迟时间"
                     ).apply {
                         callMethod = {
-                            val value = (thisProx - plusSum)
+                            val value: Int = ((thisProx - plusSum) * multiplying).toInt()
                             Log.d(TAG, "setReflectionsDelay: max = $maxProx , startPro = $startPox , value =  $value")
                             audioEffect?.reflectionsDelay = value
                         }
@@ -109,7 +109,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                     )
                         .apply {
                             callMethod = {
-                                val value = (thisProx - plusSum).toShort()
+                                val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
                                 Log.d(TAG, "setReflectionsLevel: max = $maxProx , startPro = $startPox , value =  $value")
                                 audioEffect?.reflectionsLevel = value
                             }
@@ -125,7 +125,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         detail = "这是后续混响声音的延迟时间"
                     ).apply {
                         callMethod = {
-                            val value = (thisProx - plusSum)
+                            val value: Int = ((thisProx - plusSum) * multiplying).toInt()
                             Log.d(TAG, "setReverbDelay: max = $maxProx , startPro = $startPox , value =  $value")
                             audioEffect?.reverbDelay = value
                         }
@@ -141,7 +141,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         detail = "这是后续混响声音的衰减"
                     ).apply {
                         callMethod = {
-                            val value = (thisProx - plusSum).toShort()
+                            val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
                             Log.d(TAG, "setReverbLevel: max = $maxProx , startPro = $startPox , value =  $value")
                             audioEffect?.reverbLevel = value
                         }
@@ -157,7 +157,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         detail = "这是在混响环境中高频部分的衰减"
                     ).apply {
                         callMethod = {
-                            val value = (thisProx - plusSum).toShort()
+                            val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
                             Log.d(TAG, "setRoomHFLevel: max = $maxProx , startPro = $startPox , value =  $value")
                             audioEffect?.roomHFLevel = value
                         }
@@ -173,7 +173,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         detail = "这是混响效果的环境大小"
                     ).apply {
                         callMethod = {
-                            val value = (thisProx - plusSum).toShort()
+                            val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
                             Log.d(TAG, "setRoomLevel: max = $maxProx , startPro = $startPox , value =  $value")
                             audioEffect?.roomLevel = value
                         }
