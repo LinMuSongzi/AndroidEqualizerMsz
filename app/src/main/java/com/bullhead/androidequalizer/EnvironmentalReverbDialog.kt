@@ -100,8 +100,8 @@ class EnvironmentalReverbDialog : BaseDialogFragment() {
                     }
 
                     holder.itemView.findViewById<SeekBar>(R.id.verticalSeekBar2).apply{
-                        this.max = 30
-                        progress = info.multiplying.toInt() * 10
+                        this.max = 600
+                        progress = info.multiplying.toInt() * 200
                         textTag(id_values, info)
                         setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
                             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -113,7 +113,7 @@ class EnvironmentalReverbDialog : BaseDialogFragment() {
                             }
 
                             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                                info.multiplying = seekBar.progress.toFloat() / 10
+                                info.multiplying = seekBar.progress.toFloat() / 200
                                 viewModel?.currentEnvironmentalReverbInfo?.value = info
                                 textTag(id_values, info)
                             }

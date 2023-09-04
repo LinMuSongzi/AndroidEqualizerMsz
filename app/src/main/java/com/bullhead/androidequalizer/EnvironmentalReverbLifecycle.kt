@@ -29,7 +29,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         callMethod = {
                             val value: Short = ((thisProx - plusSum).toShort() * multiplying).toInt().toShort()
 
-                            Log.d(TAG, "setDecayHFRatio: max = $maxProx , startPro = $startPox , value =  $value")
+                            Log.d(TAG, "setDecayHFRatio: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                             audioEffect?.decayHFRatio = value
                         }
                     })
@@ -45,7 +45,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                     ).apply {
                         callMethod = {
                             val value:Int = ((thisProx - plusSum) * multiplying).toInt()
-                            Log.d(TAG, "setDecayTime: max = $maxProx , startPro = $startPox , value =  $value")
+                            Log.d(TAG, "setDecayTime: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                             audioEffect?.decayTime = value
                         }
                     })
@@ -61,7 +61,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                     ).apply {
                         callMethod = {
                             val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
-                            Log.d(TAG, "setDensity: max = $maxProx , startPro = $startPox , value =  $value")
+                            Log.d(TAG, "setDensity: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                             audioEffect?.density = value
                         }
                     })
@@ -77,7 +77,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                     ).apply {
                         callMethod = {
                             val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
-                            Log.d(TAG, "setDiffusion: max = $maxProx , startPro = $startPox , value =  $value")
+                            Log.d(TAG, "setDiffusion: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                             audioEffect?.diffusion = value
                         }
                     })
@@ -93,7 +93,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                     ).apply {
                         callMethod = {
                             val value: Int = ((thisProx - plusSum) * multiplying).toInt()
-                            Log.d(TAG, "setReflectionsDelay: max = $maxProx , startPro = $startPox , value =  $value")
+                            Log.d(TAG, "setReflectionsDelay: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                             audioEffect?.reflectionsDelay = value
                         }
                     })
@@ -110,7 +110,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                         .apply {
                             callMethod = {
                                 val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
-                                Log.d(TAG, "setReflectionsLevel: max = $maxProx , startPro = $startPox , value =  $value")
+                                Log.d(TAG, "setReflectionsLevel: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                                 audioEffect?.reflectionsLevel = value
                             }
                         })
@@ -126,7 +126,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                     ).apply {
                         callMethod = {
                             val value: Int = ((thisProx - plusSum) * multiplying).toInt()
-                            Log.d(TAG, "setReverbDelay: max = $maxProx , startPro = $startPox , value =  $value")
+                            Log.d(TAG, "setReverbDelay: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                             audioEffect?.reverbDelay = value
                         }
                     })
@@ -142,7 +142,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                     ).apply {
                         callMethod = {
                             val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
-                            Log.d(TAG, "setReverbLevel: max = $maxProx , startPro = $startPox , value =  $value")
+                            Log.d(TAG, "setReverbLevel: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                             audioEffect?.reverbLevel = value
                         }
                     })
@@ -158,7 +158,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                     ).apply {
                         callMethod = {
                             val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
-                            Log.d(TAG, "setRoomHFLevel: max = $maxProx , startPro = $startPox , value =  $value")
+                            Log.d(TAG, "setRoomHFLevel: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                             audioEffect?.roomHFLevel = value
                         }
                     })
@@ -174,7 +174,7 @@ class EnvironmentalReverbLifecycle(viewModel: EnableViewModel) : BaseHandlerAudi
                     ).apply {
                         callMethod = {
                             val value: Short = ((thisProx - plusSum) * multiplying).toInt().toShort()
-                            Log.d(TAG, "setRoomLevel: max = $maxProx , startPro = $startPox , value =  $value")
+                            Log.d(TAG, "setRoomLevel: max = $maxProx , startPro = $startPox , multiplying = $multiplying , value =  $value")
                             audioEffect?.roomLevel = value
                         }
                     })
