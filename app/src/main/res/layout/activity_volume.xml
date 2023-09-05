@@ -7,11 +7,9 @@
     tools:context=".VolumeActivity">
 
 
-    <com.bullhead.androidequalizer.lifecycle.VolumeView
-        android:id="@+id/id_volume"
-        android:layout_marginTop="100dp"
+    <com.bullhead.androidequalizer.waveview.WaveLineView
+        android:id="@+id/waveLineView"
         android:layout_width="match_parent"
-        android:background="#dddddd"
-        android:layout_height="120dp"/>
-
+        android:layout_height="200dp"
+        app:wlvBackgroundColor="@android:color/white" />
 </RelativeLayout>
