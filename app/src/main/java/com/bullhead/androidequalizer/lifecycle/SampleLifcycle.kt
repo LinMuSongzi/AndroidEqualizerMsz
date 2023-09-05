@@ -17,10 +17,10 @@ class SampleLifcycle(val wavVolumeView: WaveLineView,val call:(Int)->Unit):Defau
             while (owner.lifecycle.currentState != Lifecycle.State.DESTROYED){
                 Thread.sleep(100)
 
-                var v = (Math.random() * 10f+30).toInt()
-                if(v % 2 == 0){
-                    v = (Math.random() * 40f+30).toInt()
-                }
+                var v = (Math.random() * 30f).toInt()
+//                if(v % 2 == 0){
+//                    v = (Math.random() * 40f+30).toInt()
+//                }
                 Log.i("VolumeView", "onResume: $v")
                 wavVolumeView.setVolume(v)
 

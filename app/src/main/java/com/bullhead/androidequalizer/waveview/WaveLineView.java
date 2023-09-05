@@ -20,7 +20,7 @@ import java.util.List;
  * 描    述: 绘制波浪曲线
  */
 public class WaveLineView extends RenderView {
-
+    public static final int maxVolume = 120;
     private final int DEFAULT_SAMPLING_SIZE = 64;
     private final float DEFAULT_OFFSET_SPEED = 250F;
     private final int DEFAULT_SENSIBILITY = 10;
@@ -209,9 +209,11 @@ public class WaveLineView extends RenderView {
         canvas.drawPath(paths.get(1), paint2);
     }
 
+
+
     //检查音量是否合法
     private void checkVolumeValue() {
-        if (targetVolume > 100) targetVolume = 100;
+        if (targetVolume > maxVolume) targetVolume = maxVolume;
     }
 
     //检查灵敏度值是否合法
