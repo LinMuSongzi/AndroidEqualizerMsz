@@ -4,12 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#1C202C"
     tools:context=".VolumeActivity">
 
 
     <com.bullhead.androidequalizer.waveview.WaveLineView
         android:id="@+id/waveLineView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        app:wlvBackgroundColor="@android:color/white" />
+        android:layout_height="70dp"
+        app:wlvSamplingSize="32"
+        app:wlvLineColor="#DEFFFFFF"
+        android:layout_alignParentBottom="true"
+        app:wlvMoveSpeed="300"
+        app:wlvSensibility="3" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textColor="#ffffff"
+        android:elevation="1dp"
+        android:textSize="14dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_height="wrap_content"
+        android:text="aslkasdjlk"
+        android:id="@+id/id_db_tv"/>
+
+
 </RelativeLayout>

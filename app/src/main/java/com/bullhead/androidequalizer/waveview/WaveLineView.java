@@ -47,18 +47,25 @@ public class WaveLineView extends RenderView {
 
     //波浪线颜色
     private int lineColor;
+
+    private int lineColorTow;
     //粗线宽度
     private int thickLineWidth;
     //细线宽度
     private int fineLineWidth;
 
     private final Paint paint = new Paint();
-
+    private final Paint paint2 = new Paint();
     {
         //防抖动
         paint.setDither(true);
         //抗锯齿，降低分辨率，提高绘制效率
         paint.setAntiAlias(true);
+
+        //防抖动
+        paint2.setDither(true);
+        //抗锯齿，降低分辨率，提高绘制效率
+        paint2.setAntiAlias(true);
     }
 
     private List<Path> paths = new ArrayList<>();
@@ -121,10 +128,12 @@ public class WaveLineView extends RenderView {
     }
 
     private void initAttr(AttributeSet attrs) {
+
         TypedArray t = getContext().obtainStyledAttributes(attrs, R.styleable.WaveLineView);
-        backGroundColor = t.getColor(R.styleable.WaveLineView_wlvBackgroundColor, Color.WHITE);
+        backGroundColor = t.getColor(R.styleable.WaveLineView_wlvBackgroundColor, Color.TRANSPARENT);
         samplingSize = t.getInt(R.styleable.WaveLineView_wlvSamplingSize, DEFAULT_SAMPLING_SIZE);
         lineColor = t.getColor(R.styleable.WaveLineView_wlvLineColor, Color.parseColor("#FF9162E7"));
+        lineColorTow = t.getColor(R.styleable.WaveLineView_wlvLineTowColor, -1);
         thickLineWidth = (int) t.getDimension(R.styleable.WaveLineView_wlvThickLineWidth, 1);
         fineLineWidth = (int) t.getDimension(R.styleable.WaveLineView_wlvFineLineWidth, 2);
         offsetSpeed = t.getFloat(R.styleable.WaveLineView_wlvMoveSpeed, DEFAULT_OFFSET_SPEED);
@@ -135,10 +144,12 @@ public class WaveLineView extends RenderView {
         checkSensibilityValue();
         //将RenderView放到最顶层
         setZOrderOnTop(true);
+//        setZOrderMediaOverlay(true);
         if (getHolder() != null) {
             //使窗口支持透明度
             getHolder().setFormat(PixelFormat.TRANSLUCENT);
         }
+
     }
 
     @Override
@@ -186,10 +197,16 @@ public class WaveLineView extends RenderView {
 
 
         //绘制paths，两个颜色
-        paint.setColor(Color.parseColor("#C8B0F3"));
-        canvas.drawPath(paths.get(0), paint);
+//        paint.setColor(Color.parseColor("#C8B0F3"));
+//        if (lineColorTow != -1) {
+//            paint.setColor(lineColorTow);
+//        }
+//        canvas.drawPath(paths.get(0), paint);
         paint.setColor(lineColor);
+
+        paint2.setColor(Color.parseColor("#11ffffff"));
         canvas.drawPath(paths.get(1), paint);
+        canvas.drawPath(paths.get(1), paint2);
     }
 
     //检查音量是否合法
@@ -278,6 +295,7 @@ public class WaveLineView extends RenderView {
             resetPaths();
             for (int i = 0; i < paths.size(); i++) {
                 canvas.drawPath(paths.get(i), paint);
+                canvas.drawPath(paths.get(i), paint2);
             }
         } catch (Exception e) {
         } finally {
@@ -314,7 +332,9 @@ public class WaveLineView extends RenderView {
             mapX[i] = (x / (float) width) * 4 - 2;
         }
 
-        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeWidth(2);
+        paint.setStyle(Paint.Style.STROKE);
+
         paint.setColor(lineColor);
         paint.setAntiAlias(true);
     }

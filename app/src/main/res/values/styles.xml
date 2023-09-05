@@ -36,6 +36,7 @@
        -->
         <attr format="color" name="wlvBackgroundColor"/>
         <attr format="color" name="wlvLineColor"/>
+        <attr format="color" name="wlvLineTowColor"/>
         <attr format="dimension" name="wlvThickLineWidth"/>
         <attr format="dimension" name="wlvFineLineWidth"/>
         <attr format="float" name="wlvMoveSpeed"/>
