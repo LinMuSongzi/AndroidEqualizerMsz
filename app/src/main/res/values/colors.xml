@@ -6,4 +6,7 @@
     <color name="primaryDarkColor">#101010</color>
     <color name="playingCardColor">#444caf50</color>
     <color name="textColor">#FAFAFA</color>
+<!--    、、63, 81, 181)-->
+    <color name="asd">#4051B5</color>
+
 </resources>

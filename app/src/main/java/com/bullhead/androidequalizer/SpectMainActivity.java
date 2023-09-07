@@ -4,6 +4,7 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class SpectMainActivity extends BaseActivity {
+    private static final String TAG = "SpectMainActivity";
     Toolbar toolbar;
     private static final int HANDLER_SPECTROGRAM = 0;
     private WaveFileReader reader = null;
@@ -69,6 +71,7 @@ public class SpectMainActivity extends BaseActivity {
                 InputStream inputStream = am.open("default.wav");
                 reader = new WaveFileReader();
                 data = reader.initReader(inputStream)[0]; // 获取第一声道
+                Log.i(TAG, "initWaveData: data.size = "+data.length);
                 //获取采样率
                 samplerate = reader.getSampleRate();
                 mSpectrogram.setBitspersample(reader.getBitPerSample());//设置采样点的编码长度

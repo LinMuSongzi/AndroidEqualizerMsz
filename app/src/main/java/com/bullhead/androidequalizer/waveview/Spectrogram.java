@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class Spectrogram extends View {
@@ -81,7 +82,7 @@ public class Spectrogram extends View {
      */
     public static final int NONE_TYPE_SHOW = 3;
 
-    private int show_type = GRID_TYPE_SHOW;
+    private int show_type = WAVE_TYPE_SHOW;
 
     /**
      * true=有信号,false=无信号
@@ -164,6 +165,7 @@ public class Spectrogram extends View {
                 row_local_table[i] = row_local_table[i - 1] * step;
             }
         }
+        Log.i(TAG, "onDraw: show_type = "+show_type);
         //显示频谱
         if (show_type == GRID_TYPE_SHOW) {
             // 格子的频谱(绘制横坐标)
@@ -454,6 +456,7 @@ public class Spectrogram extends View {
 
         }// 绘制波形频谱
         else if (show_type == WAVE_TYPE_SHOW) {
+            Log.i(TAG, "ShowSpectrogram: "+data.length);
             data = buf;
 
         } else if (show_type == NONE_TYPE_SHOW) {
