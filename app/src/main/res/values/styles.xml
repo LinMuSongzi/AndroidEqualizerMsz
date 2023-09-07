@@ -7,6 +7,14 @@
     </style>
 
 
+    <style name="AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/secondaryColor</item>
+    </style>
+
+
     <declare-styleable name="SpectrumView">
         <attr name="sv_color" format="color"/>
         <attr name="sv_note" format="dimension"/>
