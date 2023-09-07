@@ -18,10 +18,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 <!--        <activity-->
-<!--            android:name=".VolumeActivity"-->
+<!--            android:name=".VolumeRecordActivity"-->
 <!--            android:exported="false" />-->
+        <!-- <activity -->
+        <!-- android:name=".VolumeActivity" -->
+        <!-- android:exported="false" /> -->
         <activity
-            android:name=".VolumeActivity"
+            android:name=".VolumeRecordActivity"
             android:configChanges="screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

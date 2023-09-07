@@ -14,9 +14,48 @@
         android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         app:wlvLineColor="#DEFFFFFF"
-        app:wlvMoveSpeed="300"
-        app:wlvSamplingSize="32"
-        app:wlvSensibility="3" />
+        app:wlvMoveSpeed="400"
+        app:wlvSamplingSize="300"
+        app:wlvSensibility="10" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btn_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="测试开始" />
+
+            <Button
+                android:id="@+id/btn_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="测试结束" />
+
+        </LinearLayout>
+
+        <com.bullhead.androidequalizer.waveview.SpectrumView
+            android:id="@+id/sv"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="#dca21b"
+            app:sv_color="#ffdb8c"
+            app:sv_space="1dp"
+            app:sv_note="2dp"
+            app:sv_line="1dp"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -28,9 +67,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#335E76FF"
+            android:elevation="10dp"
             android:gravity="center"
             android:minWidth="100dp"
-            android:elevation="10dp"
             android:onClick="lowClick"
             android:padding="10dp"
             android:text="低"
@@ -38,27 +77,27 @@
             android:textSize="15dp" />
 
         <TextView
-            android:elevation="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:background="#995E76FF"
+            android:elevation="10dp"
             android:gravity="center"
             android:minWidth="100dp"
-            android:layout_marginHorizontal="10dp"
             android:onClick="midClick"
             android:padding="10dp"
-            android:background="#995E76FF"
             android:text="中"
             android:textColor="#ffffff"
             android:textSize="15dp" />
 
         <TextView
-            android:elevation="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="#5E76FF"
+            android:elevation="10dp"
             android:gravity="center"
             android:minWidth="100dp"
             android:onClick="hightClick"
-            android:background="#5E76FF"
             android:padding="10dp"
             android:text="高"
             android:textColor="#ffffff"

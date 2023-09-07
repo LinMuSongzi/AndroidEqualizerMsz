@@ -114,7 +114,7 @@ class EnvironmentalReverbDialog : BaseDialogFragment() {
 
                             override fun onStopTrackingTouch(seekBar: SeekBar) {
                                 info.multiplying = seekBar.progress.toFloat() / 200
-                                viewModel?.currentEnvironmentalReverbInfo?.value = info
+//                                viewModel?.currentEnvironmentalReverbInfo?.value = info
                                 textTag(id_values, info)
                             }
 

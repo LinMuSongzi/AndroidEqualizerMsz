@@ -27,17 +27,21 @@ class LoadAudioProcessor : BaseAudioProcessor() {
                 FileOutputStream(it, true)
             }
         }
-        return super.onConfigure(inputAudioFormat)
+        return inputAudioFormat
     }
 
 
     override fun queueInput(inputBuffer: ByteBuffer) {
+        Log.i(TAG, "queueInput: 1 "+inputBuffer.remaining())
         if (!inputBuffer.hasRemaining()) {
             return
         }
+        val remaining = inputBuffer.remaining()
         val byteArray = ByteArray(inputBuffer.remaining())
         inputBuffer.get(byteArray)
         fileOuputStream?.write(byteArray)
+        Log.i(TAG, "queueInput: 2 "+byteArray.size)
+        replaceOutputBuffer(remaining).flip()
     }
 
     override fun onFlush() {
@@ -47,6 +51,7 @@ class LoadAudioProcessor : BaseAudioProcessor() {
 
     override fun onQueueEndOfStream() {
         super.onQueueEndOfStream()
+        Log.i(TAG, "onQueueEndOfStream: ")
         fileOuputStream?.flush()
         fileOuputStream?.close()
         fileOuputStream = null

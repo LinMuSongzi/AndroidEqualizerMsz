@@ -3,6 +3,7 @@ package com.bullhead.androidequalizer.lifecycle
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Canvas
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
@@ -11,10 +12,11 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.bullhead.androidequalizer.waveview.WaveLineView
+import org.jtransforms.fft.DoubleFFT_1D
 import kotlin.math.abs
 import kotlin.math.log10
 
-class VolumeLifecycle(private val volumeView: WaveLineView) : DefaultLifecycleObserver {
+class VolumeLifecycle(private val volumeView: FFtView) : DefaultLifecycleObserver {
 
 
     private val CHANNEL_CONFIG: Int = AudioFormat.CHANNEL_IN_MONO // 单声道
@@ -75,23 +77,12 @@ class VolumeLifecycle(private val volumeView: WaveLineView) : DefaultLifecycleOb
                 // 在这里处理PCM数据
                 // buffer中的数据就是音频的PCM数据
 
-                val left = buffer.slice(0 until bytesRead step 2).map { pcmToDb(it) }.toFloatArray()
-                val right = buffer.slice(1 until bytesRead step 2).map { pcmToDb(it) }.toFloatArray()
 
-                // downsample to 60Hz (from 44100Hz) and take only the read part of the array
-                val leftValues = downsampleTo60Hz(left.sliceArray(0 until bytesRead / 2)).filter { it != Float.NEGATIVE_INFINITY }
-//                leftQueue.addAll(leftValues)
-//                val rightValues = downsampleTo60Hz(right.sliceArray(0 until bytesRead / 2)).filter { it != Float.NEGATIVE_INFINITY }
-//                rightQueue.addAll(rightValues)
+                Thread.sleep(1000)
 
 
-                volumeView.post {
-                    for(value in leftValues) {
-                        Log.i("volumeView", "startRecording: db = $value")
-                        volumeView.setVolume(value.toInt())
-                        volumeView.invalidate()
-                    }
-                }
+
+                volumeView.update(buffer,bytesRead)
             }
         }.start()
     }

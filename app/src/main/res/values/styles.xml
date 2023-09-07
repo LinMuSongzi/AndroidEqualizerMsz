@@ -5,7 +5,20 @@
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/secondaryColor</item>
     </style>
+
+
+    <declare-styleable name="SpectrumView">
+        <attr name="sv_color" format="color"/>
+        <attr name="sv_note" format="dimension"/>
+        <attr name="sv_space" format="dimension"/>
+        <attr name="sv_line" format="dimension"/>
+    </declare-styleable>
+
     <declare-styleable name="WaveLineView">
+
+
+
+
         <!--backgroundColor
         color of the view's background -->
 
