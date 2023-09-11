@@ -9,6 +9,7 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import kotlin.random.Random
 
 
 class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attrs), Runnable {
@@ -27,9 +28,9 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
     }
 
     var paint2 = Paint().apply {
-        color = Color.parseColor("#a9c8b1")
+        color = Color.BLACK
         style = Paint.Style.STROKE
-        strokeWidth = 2f
+        strokeWidth = 5f
         pathEffect = DashPathEffect(floatArrayOf(3f, 10f), 0f)
     }
 
@@ -71,14 +72,118 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
     override fun run() {
 //        sumOneMethod()
 //        sumTowMethod()
-        sumthreeMethod()
-        synchronized(lock) {
-            post {
-                invalidate()
+//        sumthreeMethod()
+//        sumFourMethod()
+        while (true) {
+            sumFiveMethod()
+            synchronized(lock) {
+                post {
+                    invalidate()
+                }
+                lock.wait()
             }
-            lock.wait()
+            Thread.sleep(100)
         }
-        Thread.sleep(100)
+    }
+
+    private fun sumFiveMethod() {
+        var sum = width.toFloat() / mumber
+        val sunHeight = height.toFloat() / 2
+
+
+        for (index in yValue.indices) {
+            yValue[index] = (sunHeight + 60 * (Math.random() * 2 - 1)).toInt()
+//            yValue[index] = (sunHeight + 50 * if (index % 2 == 0) -1 else 1).toInt()
+            Log.i(TAG, "sumTowMethod: yValue[$index] = ${yValue[index]}")
+        }
+        var index = 1
+        var x1: Float = 0f
+        var y1: Float = yValue[0].toFloat()
+        path.moveTo(x1, yValue[0].toFloat())
+
+        while (index < yValue.size) {
+
+            var x2 = (mumber * index).toFloat()
+            var y2 = yValue[index].toFloat()
+
+            var sumX1 = (mumber * (index - 1)).toFloat()
+            var sumY1 = yValue[index - 1].toFloat()
+
+            var cX = (x1 + x2) / 2
+            var cY = (y1 + y2) / 2
+
+            if (x1 != 0f && x1 != sumX1) {
+                path.quadTo(sumX1, sumY1, (sumX1 + x2) / 2, (sumY1 + y2) / 2)
+//                path.lineTo(x2, y2)
+            } else {
+                path.lineTo(cX, cY)
+            }
+
+
+
+            if (index + 1 >= yValue.size) {
+                path.lineTo(x2, y2)
+                break
+            }
+
+            var x3 = (mumber * (index + 1)).toFloat()
+            var y3 = yValue[index + 1].toFloat()
+
+
+            var aX = (x2 + x3) / 2
+            var aY = (y2 + y3) / 2f
+
+
+
+            path.quadTo(x2, y2, aX, aY)
+
+            if (index + 2 < yValue.size) {
+                if ((y3 < y2 && yValue[index + 2] < y3) || (y3 > y2 && yValue[index + 2] > y3)) {
+                    path.lineTo(x3, y3)
+                    x1 = x3
+                    y1 = y3
+                } else {
+                    x1 = aX
+                    y1 = aY
+                }
+            }
+//            path.lineTo(x3, y3)
+
+
+            index += 2
+        }
+
+
+
+
+    }
+
+    private fun sumFourMethod() {
+        var sum = width.toFloat() / mumber
+        val sunHeight = height.toFloat() / 2
+
+        path.moveTo(0f, sunHeight)
+
+        path.lineTo(mumber * 1.0f / 2, (sunHeight - 50 / 2))
+//        path.quadTo(mumber * 1.0f, sunHeight - 50, mumber * 2f - mumber / 2f, (sunHeight - 50 / 2))
+//        path.lineTo(mumber * 2f, sunHeight)
+
+//        path.lineTo(mumber * 2.0f, sunHeight)
+//        path.lineTo(mumber * 3.0f, sunHeight - 50)
+//        path.lineTo(mumber * 4.0f, sunHeight)
+//        path.lineTo(mumber * 5.0f, sunHeight - 50)
+//        path.lineTo(mumber * 6.0f, sunHeight)
+//        path.lineTo(mumber * 7.0f, sunHeight - 50)
+//        path.lineTo(mumber * 8.0f, sunHeight)
+
+
+        path.quadTo(mumber * 1.0f, sunHeight - 50, mumber * 2.0f, sunHeight)
+        path.quadTo(mumber * 3.0f, sunHeight - 80, mumber * 4.0f, sunHeight)
+        path.quadTo(mumber * 5.0f, sunHeight - 30, mumber * 6.0f, sunHeight)
+        path.quadTo(mumber * 7.0f, sunHeight - 70, mumber * 8.0f, sunHeight)
+
+//        path.cubicTo(mumber.toFloat(), sunHeight , mumber * 1.0f, sunHeight-50,mumber * 2.0f, sunHeight)
+//        path.cubicTo(mumber * 2.0f, sunHeight , mumber * 3.0f, sunHeight-50,mumber * 4.0f, sunHeight)
     }
 
     private fun sumthreeMethod() {
@@ -124,7 +229,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 //                y1 = y4
 //                index += 3
 //            } else
-                if ((y2 < y1 && y3 < y1) || ((y2 > y1 && y3 > y1))) {
+            if ((y2 < y1 && y3 < y1) || ((y2 > y1 && y3 > y1))) {
                 path.lineTo(x2, y2)
                 y1 = y2
                 index++
