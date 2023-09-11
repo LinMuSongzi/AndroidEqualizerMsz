@@ -1,5 +1,7 @@
 package com.bullhead.androidequalizer.drawable
 
+import android.animation.ValueAnimator
+import android.app.Activity
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -9,6 +11,7 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import java.nio.channels.FileLock
 import kotlin.random.Random
 
 
@@ -18,8 +21,9 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 
     val lock = Object()
     lateinit var mRandom: java.util.Random
-
     lateinit var yValue: IntArray
+
+    var startHeight = 0f
 
     var paint = Paint().apply {
         color = Color.BLUE
@@ -49,12 +53,32 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 //        }
 //    }
 
-    var mumber = 40
+    var mumber = 20
+
+    var musicDb: Int = 30
+        set(value) {
+            if (value >= 120) {
+                field = 120
+            } else if (value < 0) {
+                field = 0
+            }
+            field = value
+            synchronized(lock) {
+                resetYvalue()
+            }
+            Log.i(TAG, "音量 : musicDb = $field")
+        }
 
     override fun onDraw(canvas: Canvas) {
         if (!this::mRandom.isInitialized) {
             mRandom = java.util.Random()
-            yValue = IntArray(width / mumber)
+            var size = width / mumber
+            if (size * mumber <= width) {
+                size++
+            }
+            yValue = IntArray(size)
+            Log.i(TAG, "onDraw: mumber = $mumber , size = $size , size * mumber = ${size * mumber}")
+            resetYvalue()
             Thread(this).start()
         }
         canvas.drawPath(path, paint)
@@ -64,8 +88,21 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
         }
 
         synchronized(lock) {
-            path.reset()
+//            path.reset()
             lock.notify()
+        }
+    }
+
+    private fun resetYvalue() {
+        if (!this::yValue.isInitialized) {
+            return
+        }
+        for (index in yValue.indices) {
+            val sunHeight = if (startHeight == 0f) height * 0.75f else startHeight
+            if (startHeight == 0f) {
+                startHeight = sunHeight
+            }
+            yValue[index] = (sunHeight - ((musicDb / 120f) * Math.random() * 0.5 * height / 3f)).toInt()
         }
     }
 
@@ -74,37 +111,58 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 //        sumTowMethod()
 //        sumthreeMethod()
 //        sumFourMethod()
+//        while (true) {
+        val max: Float = (1 * 0.7f - 0.35f) * height / 20f
+
         while (true) {
-            sumFiveMethod()
+            path.reset()
+            val intArray = IntArray(yValue.size)
+            synchronized(lock) {
+                for (index in yValue.indices) {
+
+                    val newValue = (yValue[index] + (Math.random() - 0.35f) * height / 100f).toInt()
+
+                    intArray[index] = newValue
+                }
+            }
+
+            sumFiveMethod(intArray)
+
             synchronized(lock) {
                 post {
                     invalidate()
                 }
                 lock.wait()
             }
-            Thread.sleep(100)
+            Thread.sleep(50)
+            (context as? Activity)?.apply {
+                if (isFinishing) {
+                    return@run
+                }
+            }
+//            musicDb = (Math.random() * 30 + 30).toInt()
         }
     }
 
-    private fun sumFiveMethod() {
-        var sum = width.toFloat() / mumber
-        val sunHeight = height.toFloat() / 2
+    private fun sumFiveMethod(yValue: IntArray): IntArray {
+//        var sum = width.toFloat() / mumber
+//        val sunHeight = if (startHeight == 0f) height * 0.3f else startHeight
+//        Log.i(TAG, "sumFiveMethod: sunHeight = $sunHeight")
 
 
-        for (index in yValue.indices) {
-            yValue[index] = (sunHeight + 60 * (Math.random() * 2 - 1)).toInt()
-//            yValue[index] = (sunHeight + 50 * if (index % 2 == 0) -1 else 1).toInt()
-            Log.i(TAG, "sumTowMethod: yValue[$index] = ${yValue[index]}")
-        }
         var index = 1
-        var x1: Float = 0f
+        var x1 = 0f
         var y1: Float = yValue[0].toFloat()
         path.moveTo(x1, yValue[0].toFloat())
 
+        var x3 = 0f
+        var y3 = 0f
+        var x2 = 0f
+        var y2: Float
         while (index < yValue.size) {
+            x2 = (mumber * index).toFloat()
+            y2 = yValue[index].toFloat()
 
-            var x2 = (mumber * index).toFloat()
-            var y2 = yValue[index].toFloat()
 
             var sumX1 = (mumber * (index - 1)).toFloat()
             var sumY1 = yValue[index - 1].toFloat()
@@ -114,32 +172,35 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 
             if (x1 != 0f && x1 != sumX1) {
                 path.quadTo(sumX1, sumY1, (sumX1 + x2) / 2, (sumY1 + y2) / 2)
+                Log.i(TAG, "sumFiveMethod: 1 path.quadTo($sumX1, $sumY1, ${(sumX1 + x2) / 2}, ${(sumY1 + y2) / 2})")
 //                path.lineTo(x2, y2)
             } else {
                 path.lineTo(cX, cY)
+                Log.i(TAG, "sumFiveMethod: 2 path.lineTo($cX, $cY)")
             }
 
 
 
             if (index + 1 >= yValue.size) {
                 path.lineTo(x2, y2)
+                Log.i(TAG, "sumFiveMethod: 3 path.lineTo($x2, $y2)")
                 break
             }
 
-            var x3 = (mumber * (index + 1)).toFloat()
-            var y3 = yValue[index + 1].toFloat()
+            x3 = (mumber * (index + 1)).toFloat()
+            y3 = yValue[index + 1].toFloat()
 
 
             var aX = (x2 + x3) / 2
             var aY = (y2 + y3) / 2f
 
-
-
             path.quadTo(x2, y2, aX, aY)
+            Log.i(TAG, "sumFiveMethod: 4 path.quadTo($x2, $y2, $aX, $aY)")
 
             if (index + 2 < yValue.size) {
                 if ((y3 < y2 && yValue[index + 2] < y3) || (y3 > y2 && yValue[index + 2] > y3)) {
                     path.lineTo(x3, y3)
+                    Log.i(TAG, "sumFiveMethod: 5 path.lineTo($x3, $y3)")
                     x1 = x3
                     y1 = y3
                 } else {
@@ -147,159 +208,17 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
                     y1 = aY
                 }
             }
-//            path.lineTo(x3, y3)
-
 
             index += 2
         }
 
-
-
-
+//        if (x2 > x3) {
+//            path.quadTo(x3 + mumber, y3 - mumber, width.toFloat(), height.toFloat() / 2)
+//        } else {
+//            path.quadTo(x3 + mumber, y3 + mumber, width.toFloat(), height.toFloat() / 2)
+//        }
+        return yValue
     }
-
-    private fun sumFourMethod() {
-        var sum = width.toFloat() / mumber
-        val sunHeight = height.toFloat() / 2
-
-        path.moveTo(0f, sunHeight)
-
-        path.lineTo(mumber * 1.0f / 2, (sunHeight - 50 / 2))
-//        path.quadTo(mumber * 1.0f, sunHeight - 50, mumber * 2f - mumber / 2f, (sunHeight - 50 / 2))
-//        path.lineTo(mumber * 2f, sunHeight)
-
-//        path.lineTo(mumber * 2.0f, sunHeight)
-//        path.lineTo(mumber * 3.0f, sunHeight - 50)
-//        path.lineTo(mumber * 4.0f, sunHeight)
-//        path.lineTo(mumber * 5.0f, sunHeight - 50)
-//        path.lineTo(mumber * 6.0f, sunHeight)
-//        path.lineTo(mumber * 7.0f, sunHeight - 50)
-//        path.lineTo(mumber * 8.0f, sunHeight)
-
-
-        path.quadTo(mumber * 1.0f, sunHeight - 50, mumber * 2.0f, sunHeight)
-        path.quadTo(mumber * 3.0f, sunHeight - 80, mumber * 4.0f, sunHeight)
-        path.quadTo(mumber * 5.0f, sunHeight - 30, mumber * 6.0f, sunHeight)
-        path.quadTo(mumber * 7.0f, sunHeight - 70, mumber * 8.0f, sunHeight)
-
-//        path.cubicTo(mumber.toFloat(), sunHeight , mumber * 1.0f, sunHeight-50,mumber * 2.0f, sunHeight)
-//        path.cubicTo(mumber * 2.0f, sunHeight , mumber * 3.0f, sunHeight-50,mumber * 4.0f, sunHeight)
-    }
-
-    private fun sumthreeMethod() {
-        var sum = width.toFloat() / mumber
-        val sunHeight = height.toFloat() / 2
-
-
-        for (index in yValue.indices) {
-            yValue[index] = (sunHeight + 50 * if (index % 2 == 0) -1 else 1).toInt()
-            Log.i(TAG, "sumTowMethod: yValue[$index] = ${yValue[index]}")
-        }
-        path.moveTo(0f, yValue[0].toFloat())
-        var index = 0
-//        var x1:Float= (-mumber).toFloat()
-        var y1: Float = yValue[0].toFloat()
-        while (index < yValue.size) {
-
-            if (index + 1 >= yValue.size) {
-                break
-            }
-
-            val x2 = mumber * (index + 1) * 1.0f
-            val y2 = yValue[index + 1].toFloat()
-
-            if (index + 2 >= yValue.size) {
-                path.lineTo(x2, y2)
-                break
-            }
-            val x3 = mumber * (index + 2) * 1.0f
-            val y3 = yValue[index + 2].toFloat()
-
-            var x4 = 0f
-            var y4 = 0f
-            if (index + 3 < yValue.size) {
-//                path.lineTo(x2, y2)
-                x4 = mumber * (index + 3) * 1.0f
-                y4 = yValue[index + 3].toFloat()
-            }
-
-
-//            if (y4 != 0f && (y4 >= y2 && y4 < y3) || (y4 > y3 && y4 <= y2)) {
-//                path.cubicTo(x2, y2, x3, y3, x4, y4)
-//                y1 = y4
-//                index += 3
-//            } else
-            if ((y2 < y1 && y3 < y1) || ((y2 > y1 && y3 > y1))) {
-                path.lineTo(x2, y2)
-                y1 = y2
-                index++
-            } else {
-                path.quadTo(x2, y2, x3, y3)
-                y1 = y3
-                index += 2
-            }
-        }
-
-    }
-
-    private fun sumTowMethod() {
-        var sum = width.toFloat() / mumber
-        val sunHeight = height.toFloat() / 2
-        path.moveTo((-mumber).toFloat(), sunHeight)
-
-        for (index in yValue.indices) {
-            yValue[index] = (sunHeight + 50 * if (index % 2 == 0) -1 else 1).toInt()
-            Log.i(TAG, "sumTowMethod: yValue[$index] = ${yValue[index]}")
-        }
-        var index = 0
-        while (index < yValue.size) {
-            val sx = mumber * index * 1.0f
-            val sy = yValue[index].toFloat()
-//
-            val endx = mumber * index * 1.0f
-            val endy = yValue[index + 1].toFloat()
-
-            path.quadTo(sx, sy, endx, endy)
-            index += 2
-        }
-    }
-
-    private fun sumOneMethod() {
-        var sum = width.toFloat() / mumber
-        val sunHeight = height.toFloat() / 2
-
-//        while (true) {
-
-        path.moveTo(0f, sunHeight)
-//        path.lineTo(width.toFloat() - sum,sunHeight-10)
-        Log.i(TAG, "run: index * width.toFloat() / 50f = $sum , sunHeight = $sunHeight , yValue.size = ${yValue.size}")
-        for (index in yValue.indices) {
-            yValue[index] = (sunHeight + ((Math.random() * 2 - 1) * sunHeight / 10f)).toInt()
-        }
-
-        var index = 0
-
-        while (index < yValue.size) {
-
-            val sx = ((index + 1) * mumber).toFloat()
-            val sy = yValue[index].toFloat()
-            if (index + 1 >= yValue.size) {
-                break
-            }
-            val endx = ((index + 1) * mumber).toFloat()
-            val endy = yValue[index].toFloat()
-            Log.i(TAG, "run: path.quadTo(sx, sy, endx, endy) = path.quadTo($sx, $sy, $endx, $endy)")
-            path.quadTo(sx, sy, endx, endy)
-
-            index += 2
-
-        }
-        path.quadTo(width.toFloat(), height.toFloat() / 2, (width + 10).toFloat(), height.toFloat() / 2)
-
-
-    }
-
-//    }
 
 
     companion object {

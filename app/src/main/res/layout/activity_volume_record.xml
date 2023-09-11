@@ -4,8 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ADAFAE"
     tools:context=".VolumeRecordActivity">
+
+    <com.bullhead.androidequalizer.drawable.PathTestView
+        android:id="@+id/id_lineview"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"/>
+
+
+
 
     <com.bullhead.androidequalizer.waveview.WaveLineView
         android:id="@+id/waveLineView"
