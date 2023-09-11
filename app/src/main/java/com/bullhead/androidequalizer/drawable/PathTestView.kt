@@ -48,7 +48,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 //        }
 //    }
 
-    var mumber = 20
+    var mumber = 40
 
     override fun onDraw(canvas: Canvas) {
         if (!this::mRandom.isInitialized) {
@@ -69,64 +69,9 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
     }
 
     override fun run() {
-        var sum = width.toFloat() / mumber
-        val sunHeight = height.toFloat() / 2
-
-//        while (true) {
-
-        path.moveTo(0f, sunHeight / 2)
-//        path.lineTo(width.toFloat() - sum,sunHeight-10)
-        Log.i(TAG, "run: index * width.toFloat() / 50f = $sum , sunHeight = $sunHeight , yValue.size = ${yValue.size}")
-        for (index in yValue.indices) {
-            yValue[index] = (Math.random() * 80 - 50).toInt()
-        }
-//        path.quadTo(100f, sunHeight / 7, 200f, sunHeight / 2)
-//        path.quadTo(250f, sunHeight / 2 + 100, 300f, sunHeight / 7)
-
-
-//        path.quadTo(100f,sunHeight/7,200f,sunHeight/2)
-//        path.quadTo(250f,sunHeight/2+100, 300f,sunHeight/7)
-
-//
-//            path.quadTo(width/2f,sunHeight+200,width/2f-50,sunHeight-50)
-
-
-        var index = 1
-
-//        var lastY = sunHeight / 2
-        while (index < yValue.size) {
-
-            val sx = (index * mumber).toFloat()
-            val sy = yValue[index - 1].toFloat()
-            if (index + 1 >= yValue.size) {
-                break
-            }
-            val endx = ((index + 1) * mumber).toFloat()
-            val endy = yValue[index].toFloat()
-//                path.quadTo(sx-, sy, endx, endy)
-
-            path.rQuadTo(sx, sy, endx, endy)
-
-            index+=2
-
-        }
-
-//            path.cubicTo(width.toFloat(),sunHeight,width/2f,sunHeight+200,width/2f-50,sunHeight-50)
-
-//            path.cubicTo(width/2f-50,sunHeight-50,width/2f-100,sunHeight+200,width/2f-150,sunHeight-50)
-
-//            for (index in yValue.size downTo 1) {
-//                if (index == 1) {
-//                    path.lineTo(0f, yValue[0].toFloat())
-//                } else {
-//                    path.lineTo((index * mumber).toFloat(), yValue[index - 1].toFloat())
-//                }
-//                Log.i(TAG, "run: index * sum = ${index * mumber}, y = ${yValue[index - 1]}")
-//            }
-
-//            LineDa
-
-
+//        sumOneMethod()
+//        sumTowMethod()
+        sumthreeMethod()
         synchronized(lock) {
             post {
                 invalidate()
@@ -134,6 +79,118 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             lock.wait()
         }
         Thread.sleep(100)
+    }
+
+    private fun sumthreeMethod() {
+        var sum = width.toFloat() / mumber
+        val sunHeight = height.toFloat() / 2
+
+
+        for (index in yValue.indices) {
+            yValue[index] = (sunHeight + 50 * if (index % 2 == 0) -1 else 1).toInt()
+            Log.i(TAG, "sumTowMethod: yValue[$index] = ${yValue[index]}")
+        }
+        path.moveTo(0f, yValue[0].toFloat())
+        var index = 0
+//        var x1:Float= (-mumber).toFloat()
+        var y1: Float = yValue[0].toFloat()
+        while (index < yValue.size) {
+
+            if (index + 1 >= yValue.size) {
+                break
+            }
+
+            val x2 = mumber * (index + 1) * 1.0f
+            val y2 = yValue[index + 1].toFloat()
+
+            if (index + 2 >= yValue.size) {
+                path.lineTo(x2, y2)
+                break
+            }
+            val x3 = mumber * (index + 2) * 1.0f
+            val y3 = yValue[index + 2].toFloat()
+
+            var x4 = 0f
+            var y4 = 0f
+            if (index + 3 < yValue.size) {
+//                path.lineTo(x2, y2)
+                x4 = mumber * (index + 3) * 1.0f
+                y4 = yValue[index + 3].toFloat()
+            }
+
+
+//            if (y4 != 0f && (y4 >= y2 && y4 < y3) || (y4 > y3 && y4 <= y2)) {
+//                path.cubicTo(x2, y2, x3, y3, x4, y4)
+//                y1 = y4
+//                index += 3
+//            } else
+                if ((y2 < y1 && y3 < y1) || ((y2 > y1 && y3 > y1))) {
+                path.lineTo(x2, y2)
+                y1 = y2
+                index++
+            } else {
+                path.quadTo(x2, y2, x3, y3)
+                y1 = y3
+                index += 2
+            }
+        }
+
+    }
+
+    private fun sumTowMethod() {
+        var sum = width.toFloat() / mumber
+        val sunHeight = height.toFloat() / 2
+        path.moveTo((-mumber).toFloat(), sunHeight)
+
+        for (index in yValue.indices) {
+            yValue[index] = (sunHeight + 50 * if (index % 2 == 0) -1 else 1).toInt()
+            Log.i(TAG, "sumTowMethod: yValue[$index] = ${yValue[index]}")
+        }
+        var index = 0
+        while (index < yValue.size) {
+            val sx = mumber * index * 1.0f
+            val sy = yValue[index].toFloat()
+//
+            val endx = mumber * index * 1.0f
+            val endy = yValue[index + 1].toFloat()
+
+            path.quadTo(sx, sy, endx, endy)
+            index += 2
+        }
+    }
+
+    private fun sumOneMethod() {
+        var sum = width.toFloat() / mumber
+        val sunHeight = height.toFloat() / 2
+
+//        while (true) {
+
+        path.moveTo(0f, sunHeight)
+//        path.lineTo(width.toFloat() - sum,sunHeight-10)
+        Log.i(TAG, "run: index * width.toFloat() / 50f = $sum , sunHeight = $sunHeight , yValue.size = ${yValue.size}")
+        for (index in yValue.indices) {
+            yValue[index] = (sunHeight + ((Math.random() * 2 - 1) * sunHeight / 10f)).toInt()
+        }
+
+        var index = 0
+
+        while (index < yValue.size) {
+
+            val sx = ((index + 1) * mumber).toFloat()
+            val sy = yValue[index].toFloat()
+            if (index + 1 >= yValue.size) {
+                break
+            }
+            val endx = ((index + 1) * mumber).toFloat()
+            val endy = yValue[index].toFloat()
+            Log.i(TAG, "run: path.quadTo(sx, sy, endx, endy) = path.quadTo($sx, $sy, $endx, $endy)")
+            path.quadTo(sx, sy, endx, endy)
+
+            index += 2
+
+        }
+        path.quadTo(width.toFloat(), height.toFloat() / 2, (width + 10).toFloat(), height.toFloat() / 2)
+
 
     }
 
