@@ -1,6 +1,5 @@
 package com.bullhead.androidequalizer.drawable
 
-import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.graphics.Canvas
@@ -11,8 +10,6 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import java.nio.channels.FileLock
-import kotlin.random.Random
 
 
 class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attrs), Runnable {
@@ -29,6 +26,20 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
         color = Color.BLUE
         style = Paint.Style.STROKE
         strokeWidth = 2.5f
+
+        //防抖动
+        setDither(true)
+        //抗锯齿，降低分辨率，提高绘制效率
+        setAntiAlias(true)
+
+    }
+    var paintBg = Paint().apply {
+        color = Color.BLUE
+        alpha = (0.1f * 255).toInt()
+        style = Paint.Style.FILL
+        setDither(true)
+        //抗锯齿，降低分辨率，提高绘制效率
+        setAntiAlias(true)
     }
 
     var paint2 = Paint().apply {
@@ -36,6 +47,10 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
         style = Paint.Style.STROKE
         strokeWidth = 5f
         pathEffect = DashPathEffect(floatArrayOf(3f, 10f), 0f)
+        setDither(true)
+        //抗锯齿，降低分辨率，提高绘制效率
+        //抗锯齿，降低分辨率，提高绘制效率
+        setAntiAlias(true)
     }
 
     init {
@@ -53,7 +68,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 //        }
 //    }
 
-    var mumber = 20
+    var mumber = 40
 
     var musicDb: Int = 30
         set(value) {
@@ -82,7 +97,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             Thread(this).start()
         }
         canvas.drawPath(path, paint)
-
+        canvas.drawPath(path, paintBg)
         for (index in 1..10) {
             canvas.drawLine(100f * index, height - 10f, 100f * index, 0f, paint2)
         }
@@ -102,7 +117,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             if (startHeight == 0f) {
                 startHeight = sunHeight
             }
-            yValue[index] = (sunHeight - ((musicDb / 120f) * Math.random() * 0.5 * height / 3f)).toInt()
+            yValue[index] = sunHeight.toInt()//(sunHeight - ((musicDb / 120f) * Math.random() * 0.5 * height / 3f)).toInt()
         }
     }
 
@@ -119,9 +134,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             val intArray = IntArray(yValue.size)
             synchronized(lock) {
                 for (index in yValue.indices) {
-
-                    val newValue = (yValue[index] + (Math.random() - 0.35f) * height / 100f).toInt()
-
+                    val newValue = getRealMixMusicDBYvalue(index)
                     intArray[index] = newValue
                 }
             }
@@ -134,7 +147,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
                 }
                 lock.wait()
             }
-            Thread.sleep(50)
+            Thread.sleep(75)
             (context as? Activity)?.apply {
                 if (isFinishing) {
                     return@run
@@ -152,8 +165,8 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 
         var index = 1
         var x1 = 0f
-        var y1: Float = yValue[0].toFloat()
-        path.moveTo(x1, yValue[0].toFloat())
+        var y1: Float = getRealYvalue(yValue, 0)//yValue[0].toFloat()
+        path.moveTo(x1, getRealYvalue(yValue, 0).toFloat())
 
         var x3 = 0f
         var y3 = 0f
@@ -161,11 +174,11 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
         var y2: Float
         while (index < yValue.size) {
             x2 = (mumber * index).toFloat()
-            y2 = yValue[index].toFloat()
+            y2 = getRealYvalue(yValue, index)//yValue[index].toFloat()
 
 
             var sumX1 = (mumber * (index - 1)).toFloat()
-            var sumY1 = yValue[index - 1].toFloat()
+            var sumY1 = getRealYvalue(yValue, index - 1)//yValue[index - 1].toFloat()
 
             var cX = (x1 + x2) / 2
             var cY = (y1 + y2) / 2
@@ -188,7 +201,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             }
 
             x3 = (mumber * (index + 1)).toFloat()
-            y3 = yValue[index + 1].toFloat()
+            y3 = getRealYvalue(yValue, index + 1)//yValue[index + 1].toFloat()
 
 
             var aX = (x2 + x3) / 2
@@ -198,7 +211,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             Log.i(TAG, "sumFiveMethod: 4 path.quadTo($x2, $y2, $aX, $aY)")
 
             if (index + 2 < yValue.size) {
-                if ((y3 < y2 && yValue[index + 2] < y3) || (y3 > y2 && yValue[index + 2] > y3)) {
+                if ((y3 < y2 && getRealYvalue(yValue, index + 2) < y3) || (y3 > y2 && getRealYvalue(yValue, index + 2) > y3)) {
                     path.lineTo(x3, y3)
                     Log.i(TAG, "sumFiveMethod: 5 path.lineTo($x3, $y3)")
                     x1 = x3
@@ -218,6 +231,25 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 //            path.quadTo(x3 + mumber, y3 + mumber, width.toFloat(), height.toFloat() / 2)
 //        }
         return yValue
+    }
+
+    private fun getRealYvalue(yValue: IntArray, index: Int): Float {
+        val yv = (yValue[index].toFloat() - musicDb / 120f * let {
+            val sum = yValue.size / 3
+            if (sum > index) {
+                Math.random() * 0.2f + 0.3f
+            } else if (2 * sum > index) {
+                Math.random() * 0.3f
+            } else {
+                Math.random() * 0.1f
+            }
+        } * height * 0.5).toFloat()
+        Log.i(TAG, "getRealYvalue: $yv = yv")
+        return yv
+    }
+
+    private fun getRealMixMusicDBYvalue(index: Int): Int {
+        return ((yValue[index] + (Math.random() * 2 - 1) * 5)).toInt()
     }
 
 
