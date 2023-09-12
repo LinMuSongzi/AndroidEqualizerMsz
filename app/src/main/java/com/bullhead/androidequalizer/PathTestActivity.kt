@@ -19,8 +19,6 @@ class PathTestActivity : AppCompatActivity() {
     var click = false
 
 
-    var thisTime = 0L
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_path_test)
