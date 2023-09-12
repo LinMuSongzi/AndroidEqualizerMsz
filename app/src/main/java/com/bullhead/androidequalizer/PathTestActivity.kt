@@ -1,6 +1,7 @@
 package com.bullhead.androidequalizer
 
 import android.animation.ValueAnimator
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,6 +17,10 @@ class PathTestActivity : AppCompatActivity() {
     lateinit var pathTestView: PathTestView
     private var progress = 0f // 当前进度
     var click = false
+
+
+    var thisTime = 0L
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_path_test)
@@ -30,6 +35,7 @@ class PathTestActivity : AppCompatActivity() {
                     Thread.sleep(3000)
                     click = false
                 }
+
 
                 pathTestView.musicDb = (Math.random() * 120).toInt()
             }
