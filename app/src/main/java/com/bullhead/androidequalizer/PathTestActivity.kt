@@ -24,17 +24,16 @@ class PathTestActivity : AppCompatActivity() {
 
         pathTestView = findViewById(R.id.id_lineview)
 
-//        Thread {
-//            while (true) {
-//                if (click) {
-//                    Thread.sleep(6000)
-//                    click = false
-//                }else{
-//                    Thread.sleep(1000)
-//                }
-//                pathTestView.musicDb = (Math.random() * 0.5 * 100).toInt()
-//            }
-//        }.start()
+        Thread {
+            while (true) {
+                if (click) {
+                    Thread.sleep(3000)
+                    click = false
+                }
+
+                pathTestView.musicDb = (Math.random() * 120).toInt()
+            }
+        }.start()
 
     }
 

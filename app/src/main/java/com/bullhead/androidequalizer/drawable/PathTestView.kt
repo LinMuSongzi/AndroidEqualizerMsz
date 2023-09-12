@@ -1,7 +1,6 @@
 package com.bullhead.androidequalizer.drawable
 
 import android.animation.ValueAnimator
-import android.app.Activity
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -15,49 +14,82 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
-import java.lang.ref.WeakReference
 
 
 class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attrs), Runnable, LifecycleObserver {
-
+    private var valuesYValueAnimator: ValueAnimator? = null
     private var resume = false
-    var path = Path()
+    private var path = Path()
 
-    val lock = Object()
-    lateinit var mRandom: java.util.Random
-    lateinit var yValue: IntArray
-    lateinit var yRealValue: IntArray
+    private val lock = Object()
+    private lateinit var mRandom: java.util.Random
+
+    /**
+     * 上一次绘制的最后的y值
+     */
+    private lateinit var yValue: IntArray
+
+    /**
+     * 最终绘制的终点y值
+     */
+    private lateinit var yRealValue: IntArray
+
+    /**
+     * 当前绘制的y值
+     */
+    private lateinit var thisYValue: IntArray
+
+    /**
+     * 当时开始水纹位置
+     */
     var startHeight = 0f
 
-    var paint = Paint().apply {
+    /**
+     * 上一次的分贝值
+     */
+    private var musicDbLastValue = 0
+
+    /**
+     * 横坐标的数组数量，可变
+     */
+    private var mumber = 40
+    private val sleepTime = 50L
+    private val animMoveAllTime = 300f
+    val limiTime = 100L
+    private var lastTime = 0L
+
+    /**
+     * 水纹的画笔
+     */
+    private var wavePaint = Paint().apply {
         color = Color.parseColor("#ffffff")
         style = Paint.Style.STROKE
-        strokeWidth = 5f
+        strokeWidth = 2f
 
         //防抖动
-        setDither(true)
+        isDither = true
         //抗锯齿，降低分辨率，提高绘制效率
         setAntiAlias(true)
 
     }
-    var paintBg = Paint().apply {
+    private var paintBg = Paint().apply {
         color = Color.parseColor("#dddddd")
         alpha = (0.1f * 255).toInt()
         style = Paint.Style.FILL
-        setDither(true)
+        isDither = true
         //抗锯齿，降低分辨率，提高绘制效率
-        setAntiAlias(true)
+        isAntiAlias = true
     }
 
-    var paint2 = Paint().apply {
+    private var paint2 = Paint().apply {
         color = Color.parseColor("#cccccc")
         style = Paint.Style.STROKE
         strokeWidth = 5f
         pathEffect = DashPathEffect(floatArrayOf(3f, 10f), 0f)
-        setDither(true)
+        isDither = true
         //抗锯齿，降低分辨率，提高绘制效率
         //抗锯齿，降低分辨率，提高绘制效率
-        setAntiAlias(true)
+        isAntiAlias = true
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -81,47 +113,43 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
         }
     }
 
-//    override fun onResume(owner: LifecycleOwner) {
-//        if (!join) {
-//            mRandom = Random((view.measuredHeight * 0.75).toInt())
-//            yValue = IntArray(view.width / 2)
-//            Log.i(TAG, "onResume: view.measuredHeight * 0.75 = ${view.measuredHeight * 0.75}")
-//            Log.i(TAG, "run: view.width / 2 = ${view.measuredWidth / 2}")
-//            Thread(this).start()
-//            join = true
-//        }
-//    }
-
-    var mumber = 40
-
-//    var readySume = 0;
-
-    var musicDb: Int = 30
+    var musicDb: Int = 0
         set(value) {
+            val thisTime = System.currentTimeMillis()
+            if (thisTime - lastTime <= limiTime) {
+                return
+            }
+
+            lastTime = thisTime
+
             if (value >= 120) {
                 field = 120
             } else if (value < 0) {
                 field = 0
             }
             field = value
-            synchronized(lock) {
-                resetYvalue()
-                changeMusicDB(field)
-            }
+//            resetYvalue(field)
+            changeMusicDB(field)
             Log.i(TAG, "音量 : musicDb = $field")
         }
 
 
-    private fun resetYvalue() {
+    private fun resetYvalue(musicDb: Int, isCopyToo: Boolean = false) {
         if (!this::yValue.isInitialized) {
             return
         }
-        for (index in yValue.indices) {
-            val sunHeight = if (startHeight == 0f) height * 0.75f else startHeight
-            if (startHeight == 0f) {
-                startHeight = sunHeight
+        synchronized(lock) {
+            for (index in yValue.indices) {
+                val sunHeight = if (startHeight == 0f) height * 0.75f else startHeight
+                if (startHeight == 0f) {
+                    startHeight = sunHeight
+                }
+                val i = (sunHeight - musicDb / 60f * height * 0.25f * Math.random() * 0.5f).toInt()
+                if (isCopyToo) {
+                    yValue[index] = i //(sunHeight - ((musicDb / 120f) * Math.random() * 0.5 * height / 3f)).toInt()
+                }
+                yRealValue[index] = i
             }
-            yValue[index] = sunHeight.toInt()//(sunHeight - ((musicDb / 120f) * Math.random() * 0.5 * height / 3f)).toInt()
         }
     }
 
@@ -129,96 +157,62 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
     override fun onDraw(canvas: Canvas) {
         if (!this::mRandom.isInitialized) {
             mRandom = java.util.Random()
-            var size = width / mumber
-            if (size * mumber <= width) {
-                size++
+            val size = (width * 1f / mumber).let {
+                if (it > it.toInt()) {
+                    (it + 2).toInt()
+                } else {
+                    (it + 1).toInt()
+                }
             }
+//            mumber = size
             yValue = IntArray(size)
+            yRealValue = IntArray(size)
+            thisYValue = IntArray(size)
             Log.i(TAG, "onDraw: mumber = $mumber , size = $size , size * mumber = ${size * mumber}")
-            resetYvalue()
+            resetYvalue(musicDb, true)
             Thread(this).start()
         }
-        canvas.drawPath(path, paint)
+        canvas.drawPath(path, wavePaint)
         path.close()
         canvas.drawPath(path, paintBg)
         for (index in 1..10) {
             canvas.drawLine(100f * index, height - 10f, 100f * index, 0f, paint2)
         }
-
-        synchronized(lock) {
-//            path.reset()
-            lock.notify()
-        }
     }
 
-    var valuesYValueAnimator: ValueAnimator? = null
-    override fun run() {
-//        sumOneMethod()
-//        sumTowMethod()
-//        sumthreeMethod()
-//        sumFourMethod()
-//        while (true) {
 
-        val max: Float = (1 * 0.7f - 0.35f) * height / 20f
-//        synchronized(lock) {
-//            valuesYValueAnimator = ValueAnimator.ofInt(-5, -5,-5).apply {
-//                repeatCount = -1
-//                duration = 200
-//                addUpdateListener {
-//                    synchronized(lock) {
-//                        for (index in yValue.indices) {
-//                            val newValue = yValue[index] + it.animatedValue as Int
-//                            yValue[index] = newValue
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        valuesYValueAnimator.s
+    override fun run() {
+
         while (true) {
             path.reset()
-            val intArray = IntArray(yValue.size)
             synchronized(lock) {
                 for (index in yValue.indices) {
                     val newValue = getRealMixMusicDBYvalue(index)
-                    intArray[index] = newValue
+                    thisYValue[index] = newValue
                 }
+                Log.i(TAG, "run: sumFiveMethod ")
+                sumFiveMethod(thisYValue)
             }
-
-            sumFiveMethod(yValue)
 
             synchronized(lock) {
-                if (resume) {
-
-                    post {
-                        if (valuesYValueAnimator?.isPaused == true || valuesYValueAnimator?.isStarted != true) {
-                            valuesYValueAnimator?.start()
-                        }
-                        invalidate()
-                    }
+                if ((context as LifecycleOwner).lifecycle.currentState != Lifecycle.State.RESUMED) {
+                    lock.wait()
                 }
-//                valuesYValueAnimator.pause()
-                lock.wait()
-            }
-            Thread.sleep(75)
-            (context as? Activity)?.apply {
-                if (isFinishing) {
-                    return@run
+                post {
+                    invalidate()
                 }
             }
-//            musicDb = (Math.random() * 30 + 30).toInt()
+            Thread.sleep(sleepTime)
         }
     }
 
+    /**
+     * 绘制线
+     */
     private fun sumFiveMethod(yValue: IntArray): IntArray {
-//        var sum = width.toFloat() / mumber
-//        val sunHeight = if (startHeight == 0f) height * 0.3f else startHeight
-//        Log.i(TAG, "sumFiveMethod: sunHeight = $sunHeight")
-
-
         var index = 1
         var x1 = 0f
-        var y1: Float = getRealYvalue(yValue, 0)//yValue[0].toFloat()
+        var y1: Float = getRealYvalue(yValue, 0)
         path.moveTo(x1, y1)
 
         var x3: Float
@@ -227,11 +221,11 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
         var y2: Float
         while (index < yValue.size) {
             x2 = (mumber * index).toFloat()
-            y2 = getRealYvalue(yValue, index)//yValue[index].toFloat()
+            y2 = getRealYvalue(yValue, index)
 
 
             val sumX1 = (mumber * (index - 1)).toFloat()
-            val sumY1 = getRealYvalue(yValue, index - 1)//yValue[index - 1].toFloat()
+            val sumY1 = getRealYvalue(yValue, index - 1)
 
             val cX = (x1 + x2) / 2
             val cY = (y1 + y2) / 2
@@ -254,7 +248,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             }
 
             x3 = (mumber * (index + 1)).toFloat()
-            y3 = getRealYvalue(yValue, index + 1)//yValue[index + 1].toFloat()
+            y3 = getRealYvalue(yValue, index + 1)
 
 
             val aX = (x2 + x3) / 2
@@ -277,76 +271,71 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 
             index += 2
         }
-
-//        if (x2 > x3) {
-//            path.quadTo(x3 + mumber, y3 - mumber, width.toFloat(), height.toFloat() / 2)
-//        } else {
-//            path.quadTo(x3 + mumber, y3 + mumber, width.toFloat(), height.toFloat() / 2)
-//        }
         return yValue
     }
 
-    var musicDbLastValue = 0
-    private lateinit var musicDbLastValueAnim: ValueAnimator
+    /**
+     * 音量改变
+     */
     private fun changeMusicDB(field: Int) {
         if (musicDbLastValue == field) {
             return
         }
 
         if ((context as LifecycleOwner).lifecycle.currentState != Lifecycle.State.RESUMED) {
-            musicDbLastValue = field
+//            musicDbLastValue = field
             return
         }
-//        val thisW = WeakReference(this)
-        if (this::musicDbLastValueAnim.isInitialized) {
-            musicDbLastValueAnim.cancel()
+
+        if (!::yRealValue.isInitialized) {
+            return
         }
-        musicDbLastValueAnim = ValueAnimator.ofArgb(musicDbLastValue, field).apply {
-            duration = 750
-            addUpdateListener {
-                val value = it.animatedValue as Int
-                musicDbLastValue = value
-                Log.i(TAG, "changeMusicDB: $value")
+
+        synchronized(lock) {
+            val _11 = yRealValue.size / 5f
+            val _22 = _11 * 2
+            val _33 = _11 * 3
+            val _44 = _11 * 4
+            val _55 = _11 * 5
+
+
+            for (index in yRealValue.indices) {
+                if (index >= _11 && index < _44 && Math.random() > 0.5) {
+                    yRealValue[index] = (startHeight - field / 60f * height * (Math.random() * 0.3 + 0.5)).toInt()
+                } else if (index >= _33 && index < _55 && Math.random() > 0.5) {
+                    yRealValue[index] = (startHeight - field / 60f * height * 0.75f * (Math.random() * 0.2 + 0.2)).toInt()
+                } else if (index <= _11) {
+                    yRealValue[index] = (startHeight - field / 60f * height * (Math.random() * 0.2 + 0.1)).toInt()
+                } else {
+                    yRealValue[index] = (startHeight - field / 60f * height * 0.5f * (Math.random() * 0.2 + 0.2)).toInt()
+                }
+                yValue[index] = thisYValue[index]
             }
         }
-        musicDbLastValueAnim.start()
     }
 
+    /**
+     * 这个值将会被写入path 的轨迹中
+     */
     private fun getRealYvalue(yValue: IntArray, index: Int): Float {
         val yv = yValue[index]
         if (musicDbLastValue == 0) {
             return yv.toFloat()
         }
-        val size_3 = yValue.size / 3
-        val _music120 = musicDbLastValue / 120f
-        val returnValue = (if (size_3 > index) {
-            yv - _music120 * height * 0.5f
-        } else if (size_3 * 2 > index) {
-            yv - _music120 * height * 0.3f
-        } else {
-            yv - _music120 * height * 0.15f
-        })
-
-        return returnValue
+        return yv.toFloat()
     }
 
-    var realOr = 1
-    val REAL_V = 2
-    var readAnimValue = -REAL_V
-
     private fun getRealMixMusicDBYvalue(index: Int): Int {
-        val returnValue = yValue[index]
-//        val returnValue = (yValue[index] + if (realOr == 1) ++readAnimValue else --readAnimValue).apply {
-//            if (realOr == 1 && readAnimValue >= REAL_V + 1) {
-//                realOr = 0
-//            } else if (realOr == 0 && readAnimValue <= -REAL_V - 1) {
-//                realOr = 1
-//            }
-//        }
+        var old = yValue[index]
+        var new = yRealValue[index]
+        val thisv = thisYValue[index]
 
+        val checkValue = new - thisv
 
-        Log.i(TAG, "getRealMixMusicDBYvalue: musicDbLastValue = $musicDbLastValue , musicDb = $musicDb , returnValue = $returnValue , index = $index")
-        return returnValue
+        if (thisv < 2 && thisv > -2) {
+            return new
+        }
+        return (thisYValue[index] + checkValue / animMoveAllTime * sleepTime).toInt()
     }
 
 
