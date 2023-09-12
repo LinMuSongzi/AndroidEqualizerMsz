@@ -24,6 +24,8 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
     private val lock = Object()
     private lateinit var mRandom: java.util.Random
 
+    var mOnDbChangeListner: OnDbChangeListner? = null
+
     /**
      * 上一次绘制的最后的y值
      */
@@ -115,6 +117,11 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
 
     var musicDb: Int = 0
         set(value) {
+
+            if ((context as? LifecycleOwner)?.lifecycle?.currentState != Lifecycle.State.RESUMED) {
+                return
+            }
+
             val thisTime = System.currentTimeMillis()
             if (thisTime - lastTime <= limiTime) {
                 return
@@ -130,7 +137,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             field = value
 //            resetYvalue(field)
             changeMusicDB(field)
-            Log.i(TAG, "音量 : musicDb = $field")
+
         }
 
 
@@ -197,9 +204,10 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             synchronized(lock) {
                 if ((context as LifecycleOwner).lifecycle.currentState != Lifecycle.State.RESUMED) {
                     lock.wait()
-                }
-                post {
-                    invalidate()
+                } else {
+                    post {
+                        invalidate()
+                    }
                 }
             }
             Thread.sleep(sleepTime)
@@ -282,37 +290,40 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
             return
         }
 
-        if ((context as LifecycleOwner).lifecycle.currentState != Lifecycle.State.RESUMED) {
-//            musicDbLastValue = field
-            return
-        }
+
 
         if (!::yRealValue.isInitialized) {
             return
         }
 
         synchronized(lock) {
+            for (index in yRealValue.indices) {
+                yRealValue[index] = dbValueChange(field, index, yRealValue.size)
+                yValue[index] = thisYValue[index]
+            }
+        }
+    }
+
+    private fun dbValueChange(db: Int, index: Int, size: Int): Int {
+
+        return mOnDbChangeListner?.onDbValueChange(db, index, size) ?: let {
             val _11 = yRealValue.size / 5f
             val _22 = _11 * 2
             val _33 = _11 * 3
             val _44 = _11 * 4
             val _55 = _11 * 5
-
-
-            for (index in yRealValue.indices) {
-                if (index >= _11 && index < _44 && Math.random() > 0.5) {
-                    yRealValue[index] = (startHeight - field / 60f * height * (Math.random() * 0.3 + 0.5)).toInt()
-                } else if (index >= _33 && index < _55 && Math.random() > 0.5) {
-                    yRealValue[index] = (startHeight - field / 60f * height * 0.75f * (Math.random() * 0.2 + 0.2)).toInt()
-                } else if (index <= _11) {
-                    yRealValue[index] = (startHeight - field / 60f * height * (Math.random() * 0.2 + 0.1)).toInt()
-                } else {
-                    yRealValue[index] = (startHeight - field / 60f * height * 0.5f * (Math.random() * 0.2 + 0.2)).toInt()
-                }
-                yValue[index] = thisYValue[index]
+            if (index >= _11 && index < _44 && Math.random() > 0.5) {
+                (startHeight - db / 60f * height * (Math.random() * 0.3 + 0.5)).toInt()
+            } else if (index >= _33 && index < _55 && Math.random() > 0.5) {
+                (startHeight - db / 60f * height * 0.75f * (Math.random() * 0.2 + 0.2)).toInt()
+            } else if (index <= _11) {
+                (startHeight - db / 60f * height * (Math.random() * 0.2 + 0.1)).toInt()
+            } else {
+                (startHeight - db / 60f * height * 0.5f * (Math.random() * 0.2 + 0.2)).toInt()
             }
         }
     }
+
 
     /**
      * 这个值将会被写入path 的轨迹中
@@ -342,4 +353,9 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
     companion object {
         const val TAG = "PathTestDrawable"
     }
+
+    interface OnDbChangeListner {
+        fun onDbValueChange(db: Int, index: Int, size: Int): Int
+    }
+
 }
