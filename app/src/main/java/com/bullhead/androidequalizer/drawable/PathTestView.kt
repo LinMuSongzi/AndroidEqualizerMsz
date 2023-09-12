@@ -229,7 +229,7 @@ class PathTestView(context: Context?, attrs: AttributeSet?) : View(context, attr
                 sumFiveMethod(thisYValue)
                 if (pointMode == UN_CLOSE_POINT) {
                     path.lineTo((width + lineWidth).toFloat(), (height + lineWidth).toFloat())
-                    path.lineTo(0f, (height + lineWidth).toFloat())
+                    path.lineTo(-5f*lineWidth, (height + lineWidth).toFloat())
                     path.close()
                 }
             }
